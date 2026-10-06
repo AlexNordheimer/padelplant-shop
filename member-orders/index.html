@@ -46,6 +46,10 @@ header .intro{display:grid;gap:14px;min-width:0}
 header h1{font-family:var(--CA);font-style:italic;font-weight:400;font-size:clamp(46px,8vw,80px);line-height:.95;margin:0;letter-spacing:-.01em}
 header .motto{font-family:var(--CA);font-style:italic;font-size:clamp(22px,3vw,28px);margin:0}
 header p{margin:0;max-width:52ch;color:var(--soft);font-size:16px}
+.how{margin:2px 0 0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:how;max-width:56ch}
+.how li{counter-increment:how;position:relative;padding-left:30px;font-size:14px;color:var(--soft)}
+.how li::before{content:counter(how);position:absolute;left:2px;top:-2px;font-family:var(--CA);font-style:italic;font-size:20px;color:var(--green);line-height:1}
+.how b{color:var(--green);font-weight:600}
 .arch{position:relative;justify-self:center;width:min(100%,280px);aspect-ratio:4/5;border-radius:999px 999px 18px 18px;border:1px solid var(--green);background:var(--cream);overflow:hidden;display:grid;place-items:center;max-width:100%}
 .arch::before{content:"";position:absolute;inset:14px;border-radius:999px 999px 10px 10px;border:1px solid var(--faint)}
 .arch img{width:78%;height:78%;object-fit:contain;mix-blend-mode:multiply;transform:rotate(-8deg);transition:transform .6s ease}
@@ -76,8 +80,10 @@ header p{margin:0;max-width:52ch;color:var(--soft);font-size:16px}
 /* grid */
 .section-h{font-family:var(--CA);font-style:italic;font-weight:400;font-size:30px;margin:40px 0 18px}
 .section-h:first-child{margin-top:0}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:34px 22px}
-.card{display:grid;gap:10px;text-align:left;align-content:start}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:44px 28px}
+.card{display:flex;flex-direction:column;gap:8px;text-align:left;height:100%}
+.card .prices{margin-top:auto}
+.card .clubnote,.card .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .media{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#fff;max-width:100%}
 .media .fill{position:absolute;inset:-20px;background-size:cover;background-position:center;filter:blur(18px) saturate(1.1);opacity:.55}
 .media img{position:relative;width:100%;height:100%;object-fit:contain;padding:8%;transition:transform .35s ease}
@@ -90,18 +96,20 @@ header p{margin:0;max-width:52ch;color:var(--soft);font-size:16px}
 .card .brand{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
 .card h3{font-family:var(--CA);font-style:italic;font-weight:400;font-size:21px;line-height:1.15;margin:0}
 .card .sub{font-size:13px;color:var(--soft);margin:0}
-.prices{display:grid;gap:8px;margin-top:6px}
-.prices .reg{font-size:12px;color:var(--soft)}
-.prices .reg b{font-weight:600;color:var(--ink)}
-.prices .row{display:grid;gap:4px;border:1px solid var(--green);border-radius:12px;padding:10px 14px 11px}
-.prices .row.top{background:var(--green);color:var(--cream)}
-.prices .who{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.8;white-space:nowrap}
-.prices .pline{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.prices .save{font-family:var(--CA);font-style:italic;font-size:24px;line-height:1.1;white-space:nowrap}
-.prices .pay{font-size:12px;opacity:.85;white-space:nowrap}
-.prices .pay b{font-weight:600;font-size:14px;margin-left:4px}
-.prices.big .save{font-size:30px}
-.prices.big .pay b{font-size:16px}
+.prices{display:grid;gap:6px;padding-top:4px}
+.prices .reg{display:flex;align-items:baseline;gap:8px}
+.prices .reg .amt{font-family:var(--CA);font-size:22px;line-height:1}
+.prices .reg .lbl{font-size:11px;color:var(--soft);letter-spacing:.06em}
+.prices .mrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:10px;height:38px;padding:0 6px 0 12px;border:1px solid var(--green);border-radius:10px;white-space:nowrap}
+.prices .mrow.top{background:var(--green);color:var(--cream)}
+.prices .who{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis}
+.prices .mp{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.prices .sv{font-size:11px;font-weight:600;border-radius:999px;padding:5px 9px;background:var(--cream);color:var(--green);font-variant-numeric:tabular-nums}
+.prices .mrow:not(.top) .sv{background:var(--green);color:var(--cream)}
+.prices.big .mrow{height:46px;padding-left:14px}
+.prices.big .mp{font-size:18px}
+.prices.big .sv{font-size:12px}
+.prices.big .reg .amt{font-size:28px}
 .tiers{display:grid;gap:10px;margin:22px 0 6px}
 .tiers .q{font-family:var(--CA);font-style:italic;font-size:22px}
 .tieropt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:center;text-align:left;border:1px solid var(--green);border-radius:14px;padding:14px 18px}
@@ -190,8 +198,13 @@ footer .caslon{font-size:20px;color:var(--green)}
     <div class="intro">
       <div class="label">The pro shop at Padel Plant</div>
       <h1>Casa Hirostar</h1>
-      <p class="motto">Padel, the Italian way.</p>
-      <p>Shop what's on the wall today, or order from Hirostar and Wilson. We put in one order every Monday and let you know when it's waiting at the front desk. You pay when you pick it up.</p>
+      <p>See what we have in stock in the pro shop, or order something we don't carry and we'll bring it in for you. Members save 20 or 30 percent on everything.</p>
+      <ol class="how">
+        <li><b>Browse</b> what's in store now, or switch to Order online for the full Hirostar, Wilson and Nox range.</li>
+        <li><b>Send your order</b> by Sunday at midnight. Nothing is charged online.</li>
+        <li><b>We order Monday</b> and let you know when it's waiting at the front desk.</li>
+        <li><b>Pick up and pay</b> in store. Your member price is applied at the desk.</li>
+      </ol>
       <div class="cutoff" id="cutoff"></div>
     </div>
     <div class="arch" aria-hidden="true">
@@ -247,7 +260,7 @@ const TIERS = [
   {id:'players',  label:'Players member',  off:0.20},
   {id:'other',    label:'Other / guest',   off:0}
 ];
-const CUTOFF = {day:0, hour:21}; // Sunday 9 PM Eastern
+const CUTOFF = {day:0}; // Sunday at midnight Eastern
 const HS = 'https://hirostar.com/';
 const MEN = ['S','M','L','XL','XXL'], WOMEN = ['XS','S','M','L','XL'];
 
@@ -431,7 +444,7 @@ const CATS = ['Racquets','Pickleball','Shoes','Apparel','Bags & accessories'];
    They show only under "In store" and are bought at the front desk. */
 const SHOP_ONLY = []; const shopOnlySeen = new Set();
 const SHOE_MODELS = [
-  {re:/^intrigue/i, name:'Intrigue', sub:"Women's padel shoe", img:'WRS336940_/WRS336940__a0f6de9eea65eebeb983d1a15af67b22.png'},
+  {re:/^intrigue/i, name:'Intrigue Tour', sub:"Women's padel shoe", img:'WRS336940_/WRS336940__a0f6de9eea65eebeb983d1a15af67b22.png'},
   {re:/^bela tour/i, name:'Bela Tour', sub:"Men's padel shoe", img:'WRS331580_/WRS331580__b61bcf735c83cd0996c7640112b4acb2.png'},
   {re:/^hurakn pro v2/i, name:'Hurakn Pro V2', sub:"Men's padel shoe", img:'WRS335560_/WRS335560__bc5e276fa63a4213ae889c5c8a20e3a6.png'},
   {re:/^hurakn 2\.0/i, name:'Hurakn 2.0', sub:"Men's padel shoe", img:''}
@@ -479,11 +492,11 @@ const memberPrice = p => offPrice(p, tier()?tier().off:0);
 const PLAYERS = TIERS.find(t=>t.id==='players'), FOUNDING = TIERS.find(t=>t.id==='founding');
 const firstImg = p => p.img || (p.colors ? Object.values(p.colors)[0] : '');
 
-/* cutoff: next Sunday 9 PM Eastern; order placed the following Monday */
+/* cutoff: Sunday at midnight Eastern; order placed Monday */
 function nyNow(){ return new Date(new Date().toLocaleString('en-US',{timeZone:'America/New_York'})); }
 function orderWindow(){
   const now = nyNow();
-  const cut = new Date(now); cut.setHours(CUTOFF.hour,0,0,0);
+  const cut = new Date(now); cut.setHours(23,59,59,999);
   cut.setDate(cut.getDate() + ((CUTOFF.day - cut.getDay() + 7) % 7));
   if (cut <= now) cut.setDate(cut.getDate()+7);
   const place = new Date(cut); place.setDate(place.getDate()+1);
@@ -492,7 +505,7 @@ function orderWindow(){
 const fmtDay = d => d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 function renderCutoff(){
   const {cut} = orderWindow();
-  $('#cutoff').textContent = 'This week’s order closes ' + fmtDay(cut) + ' at 9 PM';
+  $('#cutoff').textContent = 'This week’s orders close ' + fmtDay(cut) + ' at midnight';
 }
 
 /* chips */
@@ -519,14 +532,17 @@ function renderFilters(){
 
 function priceBlock(p, big){
   const w = document.createElement('div'); w.className='prices'+(big?' big':'');
-  const reg = document.createElement('div'); reg.className='reg'; reg.innerHTML='Regular price <b></b>'; reg.querySelector('b').textContent=money(p.price); w.appendChild(reg);
+  const reg = document.createElement('div'); reg.className='reg';
+  const a=document.createElement('span'); a.className='amt'; a.textContent=money(p.price);
+  const l=document.createElement('span'); l.className='lbl'; l.textContent='Regular price';
+  reg.append(a,l); w.appendChild(reg);
   [FOUNDING, PLAYERS].forEach((t,k)=>{
-    const r=document.createElement('div'); r.className='row'+(k===0?' top':'');
-    const who=document.createElement('span'); who.className='who'; who.textContent=t.label.replace(' member','')+' \u00b7 '+Math.round(t.off*100)+'% off'; r.appendChild(who);
-    const line=document.createElement('div'); line.className='pline';
-    const sv=document.createElement('span'); sv.className='save'; sv.textContent='Save '+money(Math.round((p.price-offPrice(p.price,t.off))*100)/100);
-    const pay=document.createElement('span'); pay.className='pay'; pay.innerHTML='You pay<b></b>'; pay.querySelector('b').textContent=money(offPrice(p.price,t.off));
-    line.append(sv,pay); r.appendChild(line); w.appendChild(r);
+    const r=document.createElement('div'); r.className='mrow'+(k===0?' top':'');
+    const who=document.createElement('span'); who.className='who'; who.textContent=t.label.replace(' member','');
+    const mp=document.createElement('span'); mp.className='mp'; mp.textContent=money(offPrice(p.price,t.off));
+    const sv=document.createElement('span'); sv.className='sv'; sv.textContent='Save '+money(Math.round((p.price-offPrice(p.price,t.off))*100)/100);
+    r.title=t.label+' price, '+Math.round(t.off*100)+'% off';
+    r.append(who,mp,sv); w.appendChild(r);
   });
   return w;
 }
@@ -750,7 +766,7 @@ function openReview(){
     const notes=document.createElement('textarea'); notes.id='f-notes'; notes.style.minHeight='64px'; nd.appendChild(notes); f.appendChild(nd);
 
     const fine=document.createElement('p'); fine.className='fine';
-    fine.textContent='Nothing is charged now. Orders close '+fmtDay(cut)+' at 9 PM and go in the next morning. We’ll text you when your gear is at the front desk, and you can pay in store or on the card you have on file.';
+    fine.textContent='Nothing is charged now. Orders close '+fmtDay(cut)+' at midnight and are placed Monday. We’ll let you know when your gear is at the front desk, and you can pay in store or on the card you have on file.';
     w.appendChild(fine);
     const err=document.createElement('p'); err.className='err'; err.setAttribute('role','alert');
     const send=document.createElement('button'); send.type='button'; send.className='btn'; send.textContent='Send my order';
@@ -762,7 +778,7 @@ function openReview(){
       if(!tier()){ err.textContent='Pick your membership above.'; tiersBox.scrollIntoView({behavior:'smooth',block:'center'}); return; }
       if(!nm.value.trim()){ err.textContent='Add your name so we can match it to your membership.'; nm.focus(); return; }
       if(!/^\S+@\S+\.\S+$/.test(em.value.trim())){ err.textContent='Add an email we can reach you at.'; em.focus(); return; }
-      if(ph.value.replace(/\D/g,'').length<10){ err.textContent='Add a mobile number so we can text you when it arrives.'; ph.focus(); return; }
+      if(ph.value.replace(/\D/g,'').length<10){ err.textContent='Add a mobile number so we can reach you when it arrives.'; ph.focus(); return; }
       state.me={name:nm.value.trim(), email:em.value.trim(), phone:ph.value.trim()}; store.set('me',state.me);
       const t=totals();
       const items = state.bag.map(l=>{ const i=lineInfo(l); return l.pid==='request' ? '• REQUEST ('+l.brand+' '+l.cat+'): '+l.text : '• '+l.qty+' × '+i.name+(i.meta?' — '+i.meta:'')+' — '+money(i.member)+(tier().off?' (regular '+money(i.list)+')':''); }).join('\n');
@@ -778,7 +794,7 @@ function openReview(){
         const d=document.createElement('div'); d.className='done';
         d.innerHTML='<div class="label">Order received</div><h2></h2><p></p>';
         d.querySelector('h2').textContent='Thanks, '+first+'.';
-        d.querySelector('p').textContent='Your order goes in on '+fmtDay(place)+'. We’ll text '+state.me.phone+' when it’s ready at the front desk.';
+        d.querySelector('p').textContent='Your order goes in on '+fmtDay(place)+'. We’ll let you know when it’s ready at the front desk.';
         const b=document.createElement('button'); b.type='button'; b.className='btn'; b.style.marginTop='10px'; b.textContent='Keep browsing'; b.onclick=closeSheet; d.appendChild(b);
         body.appendChild(d);
       }catch(e){
