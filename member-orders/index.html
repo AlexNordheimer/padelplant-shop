@@ -41,19 +41,19 @@ img{max-width:100%;display:block}
 
 /* header */
 header{display:grid;gap:30px;margin-bottom:38px;align-items:center}
-@media (min-width:820px){header{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}}
+@media (min-width:820px){header{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}}
 header .intro{display:grid;gap:14px;min-width:0}
-header h1{font-family:var(--CA);font-style:italic;font-weight:400;font-size:clamp(56px,11vw,112px);line-height:.9;margin:0;letter-spacing:-.01em}
+header h1{font-family:var(--CA);font-style:italic;font-weight:400;font-size:clamp(46px,8vw,80px);line-height:.95;margin:0;letter-spacing:-.01em}
 header .motto{font-family:var(--CA);font-style:italic;font-size:clamp(22px,3vw,28px);margin:0}
 header p{margin:0;max-width:52ch;color:var(--soft);font-size:16px}
-.arch{position:relative;justify-self:center;width:min(100%,360px);aspect-ratio:4/5;border-radius:999px 999px 18px 18px;border:1px solid var(--green);background:var(--cream);overflow:hidden;display:grid;place-items:center;max-width:100%}
+.arch{position:relative;justify-self:center;width:min(100%,280px);aspect-ratio:4/5;border-radius:999px 999px 18px 18px;border:1px solid var(--green);background:var(--cream);overflow:hidden;display:grid;place-items:center;max-width:100%}
 .arch::before{content:"";position:absolute;inset:14px;border-radius:999px 999px 10px 10px;border:1px solid var(--faint)}
 .arch img{width:78%;height:78%;object-fit:contain;mix-blend-mode:multiply;transform:rotate(-8deg);transition:transform .6s ease}
 .arch:hover img{transform:rotate(-2deg) scale(1.03)}
 @media (max-width:819px){header{position:relative}.arch{position:absolute;top:0;right:0;width:112px}.arch::before{inset:7px}.arch .stamp{display:none}header .label,header h1{max-width:calc(100% - 124px)}}
 .arch .stamp{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:var(--green);color:var(--cream);border-radius:999px;padding:6px 14px;font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap}
-.details{display:grid;gap:10px;justify-items:center;text-align:center;margin:6px auto 40px;max-width:640px;padding-block:30px;border-block:1px solid var(--faint)}
-.details q{font-family:var(--CA);font-style:italic;font-size:clamp(24px,3.4vw,34px);line-height:1.15;quotes:none}
+.details{display:grid;gap:6px;justify-items:center;text-align:center;margin:0 auto 32px;max-width:640px;padding-block:20px}
+.details q{font-family:var(--CA);font-style:italic;font-size:clamp(20px,2.6vw,26px);line-height:1.15;quotes:none}
 .details span{font-size:13px;color:var(--soft)}
 .cutoff{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
 .cutoff::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green)}
@@ -90,17 +90,18 @@ header p{margin:0;max-width:52ch;color:var(--soft);font-size:16px}
 .card .brand{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
 .card h3{font-family:var(--CA);font-style:italic;font-weight:400;font-size:21px;line-height:1.15;margin:0}
 .card .sub{font-size:13px;color:var(--soft);margin:0}
-.prices{display:grid;gap:6px;margin-top:4px}
+.prices{display:grid;gap:8px;margin-top:6px}
 .prices .reg{font-size:12px;color:var(--soft)}
 .prices .reg b{font-weight:600;color:var(--ink)}
-.prices .row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 10px;border:1px solid var(--green);border-radius:12px;padding:8px 12px}
-.prices .row.top{background:var(--green);color:var(--cream);border-color:var(--green)}
-.prices .who{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.8}
-.prices .save{font-family:var(--CA);font-style:italic;font-size:26px;line-height:1.05;grid-column:1;white-space:nowrap}
-.prices .pay{font-size:12px;grid-column:2;grid-row:1/3;text-align:right;opacity:.8;white-space:nowrap}
-.prices .pay b{display:block;font-size:15px;opacity:1}
-.prices.big .save{font-size:34px}
-.prices.big .pay b{font-size:17px}
+.prices .row{display:grid;gap:4px;border:1px solid var(--green);border-radius:12px;padding:10px 14px 11px}
+.prices .row.top{background:var(--green);color:var(--cream)}
+.prices .who{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.8;white-space:nowrap}
+.prices .pline{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.prices .save{font-family:var(--CA);font-style:italic;font-size:24px;line-height:1.1;white-space:nowrap}
+.prices .pay{font-size:12px;opacity:.85;white-space:nowrap}
+.prices .pay b{font-weight:600;font-size:14px;margin-left:4px}
+.prices.big .save{font-size:30px}
+.prices.big .pay b{font-size:16px}
 .tiers{display:grid;gap:10px;margin:22px 0 6px}
 .tiers .q{font-family:var(--CA);font-style:italic;font-size:22px}
 .tieropt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:center;text-align:left;border:1px solid var(--green);border-radius:14px;padding:14px 18px}
@@ -182,10 +183,7 @@ footer .caslon{font-size:20px;color:var(--green)}
   <textarea name="items_json"></textarea><textarea name="notes"></textarea>
 </form>
 
-<div class="ribbon" aria-hidden="true"><div class="track">
-  <span>Casa Hirostar</span><span><i>Padel, the Italian way</i></span><span>The pro shop at Padel Plant</span><span>Richmond, VA</span><span>Racquets · Shoes · Apparel</span>
-  <span>Casa Hirostar</span><span><i>Padel, the Italian way</i></span><span>The pro shop at Padel Plant</span><span>Richmond, VA</span><span>Racquets · Shoes · Apparel</span>
-</div></div>
+
 
 <div class="wrap">
   <header>
@@ -279,6 +277,12 @@ const PRODUCTS = [
 
   // ---------- Hirostar accessories ----------
 
+  // ---------- Nox (US list prices from noxsportusa.com) ----------
+  {id:'nx-at10-genius-18k', brand:'Nox', cat:'Racquets', name:'AT10 Genius 18K 2026', sub:'Agust\u00edn Tapia signature', price:455, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-18k-alum-2026-by-agustin-tapia-pat10genius1826-8435778902621-2175122.png?v=1769512354', url:'https://noxsportusa.com/products/at10-genius-18k-tapia-2026-racket', tag:'New'},
+  {id:'nx-ea10-ventus-attack', brand:'Nox', cat:'Racquets', name:'EA10 Ventus Attack 12K 2026', sub:'Edu Alonso signature \u00b7 power', price:400, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/ea10-ventus-attack-12k-xtrem-by-edu-alonso-pea10ventusa1226-8435778902683-7841159.png?v=1769512358', url:'https://noxsportusa.com/products/ea10-ventus-attack-12k-2026-racket', tag:'New'},
+  {id:'nx-ventus-hybrid-lite', brand:'Nox', cat:'Racquets', name:'Ventus Hybrid 12K Lite 2026', sub:'Lighter, all-round', price:350, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/ventus-hybrid-12k-lite-pventus12hl-8435778902713-2355266.png?v=1769512358', url:'https://noxsportusa.com/products/ventus-12k-hybrid-lite-2026-racket', tag:'New'},
+  {id:'nx-xfoam-jma', brand:'Nox', cat:'Pickleball', name:'X-FOAM JMA 16mm', sub:'Pickleball paddle', price:249.95, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/pala-pickleball-x-foam-jma-16mm-palas-pickleball-ppixfojma26nox-8910291.png?v=1769512320', url:'https://noxsportusa.com/products/2026-pickleball-paddle-x-foam-jma-16mm', tag:'New'},
+
   // ---------- Wilson (US prices from wilson.com, Oct 2026) ----------
   ...WILSON()
 ];
@@ -345,7 +349,7 @@ function WILSON(){
 }
 
 // Brands shown as filter chips, even before their products are loaded
-const BRANDS = ['Hirostar','Wilson'];
+const BRANDS = ['Hirostar','Wilson','Nox'];
 
 /* In stock at Padel Plant: product id -> short note shown on the card.
    These items get an "At Padel Plant" badge, sort first, and get their own filter chip.
@@ -365,6 +369,8 @@ const TOAST_LINK = [
   ['Wilson Endure V1','wl-wr19040'],
   ['Wilson Optix Lite','wl-wr19070'], ['Wilson Bela Super Tour Padel Racket Bag','wl-wr8910800'],
   ['Rush Pro 5','wl-wrs00930'],
+  ['Nox AT10','nx-at10-genius-18k'], ['AT10','nx-at10-genius-18k'], ['Nox EA10','nx-ea10-ventus-attack'], ['EA10','nx-ea10-ventus-attack'],
+  ['Nox Ventus Hybrid','nx-ventus-hybrid-lite'], ['Ventus Hybrid','nx-ventus-hybrid-lite'], ['Nox X-FOAM JMA','nx-xfoam-jma'], ['X-FOAM JMA','nx-xfoam-jma'], ['X FOAM JMA','nx-xfoam-jma'],
   ['Wilson League Polo','wl-league-polo'], ['League Polo','wl-league-polo'], ['Wilson Midtown Tennis Skirt','wl-midtown-skirt'],
   ['M Tournament Short V2','wl-tournament-short'], ['All Day Half-Zip','wl-allday-halfzip'], ['Wilson Pro Seamless Tank','wl-pro-seamless-tank'],  
   ['Alien Kit Shorts','hs-alien-shorts'], ['Alien Kit','hs-alien-tee'], ['Alien Logo Tee','hs-alien-logo-tee'],
@@ -400,13 +406,19 @@ async function loadStock(){
       const sz = sizeOf(it.name); if (sz) f.sizes.add(sz);
       if (it.quantity != null){ f.qty += it.quantity; f.counted = true; }
     });
-    SHOP_ONLY.forEach(p=>{ PRODUCTS.push(p); AT_CLUB[p.id] = 'In stock at Casa Hirostar'; found[p.id] = found[p.id] || {sizes:new Set()}; });
+    SHOP_ONLY.forEach(p=>{
+      if (!(p.price > 0)) return;
+      PRODUCTS.push(p);
+      const sizes = p.shopSizes ? sortSizes([...p.shopSizes]) : [];
+      AT_CLUB[p.id] = sizes.length ? 'In store in size'+(sizes.length>1?'s ':' ')+sizes.join(', ') : 'In stock in store';
+      found[p.id] = found[p.id] || {sizes:new Set()};
+    });
     Object.entries(found).forEach(([id,f])=>{
       if (id.startsWith('ts-')) return;
       const sizes = sortSizes([...f.sizes]);
-      AT_CLUB[id] = sizes.length ? 'At Casa Hirostar in size'+(sizes.length>1?'s ':' ')+sizes.join(', ')
-                  : f.counted && f.qty <= 2 ? 'Only '+Math.floor(f.qty)+' left at Casa Hirostar'
-                  : 'In stock at Casa Hirostar';
+      AT_CLUB[id] = sizes.length ? 'In store in size'+(sizes.length>1?'s ':' ')+sizes.join(', ')
+                  : f.counted && f.qty <= 2 ? 'Only '+Math.floor(f.qty)+' left in store'
+                  : 'In stock in store';
     });
     state.stockLoaded = true;
     if (!Object.keys(found).length) state.where = 'online';
@@ -416,10 +428,26 @@ async function loadStock(){
 const CATS = ['Racquets','Pickleball','Shoes','Apparel','Bags & accessories'];
 
 /* Racquets and pickleball paddles in Toast's Retail menu that aren't in the online catalog.
-   They show only under "At Casa Hirostar" and are bought at the front desk. */
+   They show only under "In store" and are bought at the front desk. */
 const SHOP_ONLY = []; const shopOnlySeen = new Set();
+const SHOE_MODELS = [
+  {re:/^intrigue/i, name:'Intrigue', sub:"Women's padel shoe", img:'WRS336940_/WRS336940__a0f6de9eea65eebeb983d1a15af67b22.png'},
+  {re:/^bela tour/i, name:'Bela Tour', sub:"Men's padel shoe", img:'WRS331580_/WRS331580__b61bcf735c83cd0996c7640112b4acb2.png'},
+  {re:/^hurakn pro v2/i, name:'Hurakn Pro V2', sub:"Men's padel shoe", img:'WRS335560_/WRS335560__bc5e276fa63a4213ae889c5c8a20e3a6.png'},
+  {re:/^hurakn 2\.0/i, name:'Hurakn 2.0', sub:"Men's padel shoe", img:''}
+];
+const WIMG = x => x ? 'https://www.wilson.com/en-us/media/catalog/product/article_images/'+x+'?quality=80&bg-color=F3F1ED&fit=bounds&height=600&width=600' : '';
+function addShopShoe(it, model){
+  const id = 'ts-shoe-'+norm(model.name).replace(/ /g,'-');
+  let p = SHOP_ONLY.find(x=>x.id===id);
+  if (!p){ p = {id, brand:'Wilson', cat:'Shoes', name:model.name, sub:model.sub+' \u00b7 in the pro shop', price:0, img:WIMG(model.img), shopOnly:true, shopSizes:new Set()}; SHOP_ONLY.push(p); }
+  if (it.price > p.price) p.price = it.price;
+  const sz = sizeOf(it.name); if (sz) p.shopSizes.add(sz);
+}
 function addShopOnly(it){
   const n = it.name || ''; const g = it.group || '';
+  const model = SHOE_MODELS.find(m=>m.re.test(n.trim()));
+  if (model){ addShopShoe(it, model); return; }
   if (!(it.price > 0) || /rental|ball|overgrip|grip|bag|backpack|shoe|tee|shirt|hat|hoodie|tank|skirt|short|tote|glass/i.test(n)) return;
   let cat = null;
   if (/pickle/i.test(g) || /\b(joola|owl)\b/i.test(n)) cat = 'Pickleball';
@@ -481,7 +509,7 @@ function chipRow(el, items, current, onPick){
   });
 }
 function renderFilters(){
-  chipRow($('#clubChip'), [{id:'shop',label:'At Casa Hirostar'},{id:'online',label:'Order online'}], state.where, id=>{ state.where=id; renderFilters(); renderCatalog(); });
+  chipRow($('#clubChip'), [{id:'shop',label:'In store'},{id:'online',label:'Order online'}], state.where, id=>{ state.where=id; renderFilters(); renderCatalog(); });
   const pool = PRODUCTS.filter(p=>state.where==='shop' ? atClub(p) : !p.shopOnly);
   const brands = [...new Set([...BRANDS.filter(b=>pool.some(p=>p.brand===b)), ...pool.map(p=>p.brand)])];
   if (state.brand!=='All' && !brands.includes(state.brand)) state.brand='All';
@@ -495,9 +523,10 @@ function priceBlock(p, big){
   [FOUNDING, PLAYERS].forEach((t,k)=>{
     const r=document.createElement('div'); r.className='row'+(k===0?' top':'');
     const who=document.createElement('span'); who.className='who'; who.textContent=t.label.replace(' member','')+' \u00b7 '+Math.round(t.off*100)+'% off'; r.appendChild(who);
-    const sv=document.createElement('span'); sv.className='save'; sv.textContent='Save '+money(Math.round((p.price-offPrice(p.price,t.off))*100)/100); r.appendChild(sv);
-    const pay=document.createElement('span'); pay.className='pay'; pay.innerHTML='You pay<b></b>'; pay.querySelector('b').textContent=money(offPrice(p.price,t.off)); r.appendChild(pay);
-    w.appendChild(r);
+    const line=document.createElement('div'); line.className='pline';
+    const sv=document.createElement('span'); sv.className='save'; sv.textContent='Save '+money(Math.round((p.price-offPrice(p.price,t.off))*100)/100);
+    const pay=document.createElement('span'); pay.className='pay'; pay.innerHTML='You pay<b></b>'; pay.querySelector('b').textContent=money(offPrice(p.price,t.off));
+    line.append(sv,pay); r.appendChild(line); w.appendChild(r);
   });
   return w;
 }
@@ -526,7 +555,7 @@ function renderCatalog(){
     items.forEach(p=>{
       shown++;
       const card=document.createElement('button'); card.type='button'; card.className='card';
-      card.appendChild(mediaEl(firstImg(p), atClub(p)?'At Casa Hirostar':p.tag, p.name, atClub(p)));
+      card.appendChild(mediaEl(firstImg(p), atClub(p)?'In store':p.tag, p.name, atClub(p)));
       const br=document.createElement('div'); br.className='brand'; br.textContent=p.brand; card.appendChild(br);
       const t=document.createElement('h3'); t.textContent=p.name; card.appendChild(t);
       const s=document.createElement('p'); s.className='sub'; s.textContent=p.sub; card.appendChild(s);
@@ -549,7 +578,7 @@ function renderCatalog(){
   });
   if (!shown){ const e=document.createElement('p'); e.className='empty';
     e.textContent = state.where==='shop'
-      ? (state.stockLoaded ? 'Nothing here is at Casa Hirostar right now. Tap \u201cOrder online\u201d to get it in with this week\u2019s order.' : 'Checking what\u2019s at Casa Hirostar\u2026')
+      ? (state.stockLoaded ? 'Nothing here is in store right now. Tap \u201cOrder online\u201d to get it in with this week\u2019s order.' : 'Checking what\u2019s in store\u2026')
       : 'Nothing here yet. Try another brand or category, or ask us at the front desk.';
     main.appendChild(e); }
 }
@@ -575,21 +604,21 @@ function openProduct(p){
   openSheet(body=>{
     const d=document.createElement('div'); d.className='detail'; body.appendChild(d);
     const left=document.createElement('div'); d.appendChild(left);
-    let media = mediaEl(p.colors?p.colors[sel.color]:p.img, atClub(p)?'At Casa Hirostar':p.tag, p.name, atClub(p)); left.appendChild(media);
+    let media = mediaEl(p.colors?p.colors[sel.color]:p.img, atClub(p)?'In store':p.tag, p.name, atClub(p)); left.appendChild(media);
     const right=document.createElement('div'); d.appendChild(right);
     const br=document.createElement('div'); br.className='label'; br.style.color='var(--soft)'; br.textContent=p.brand+' · '+p.cat; right.appendChild(br);
     const h=document.createElement('h2'); h.textContent=p.name; right.appendChild(h);
     const s=document.createElement('p'); s.className='desc'; s.textContent=p.sub+(p.colorNote?' \u00b7 '+p.colorNote:''); right.appendChild(s);
     if (atClub(p)){ const n=document.createElement('p'); n.className='clubnote'; n.style.margin='-8px 0 16px'; n.textContent=(AT_CLUB[p.id]||'In stock at the front desk')+'. Ask us if you want it today.'; right.appendChild(n); }
     const pb=priceBlock(p,true); pb.style.marginBottom='20px'; right.appendChild(pb);
-    if (p.shopOnly){ const n=document.createElement('p'); n.className='desc'; n.textContent='In stock at Casa Hirostar. Come by the front desk to try it and buy it. Member prices apply.'; right.appendChild(n); return; }
+    if (p.shopOnly){ const n=document.createElement('p'); n.className='desc'; n.textContent='In stock in store. Come by the front desk to try it and buy it. Member prices apply.'; right.appendChild(n); return; }
 
     if (p.colors){
       const keys=Object.keys(p.colors);
       const o=document.createElement('div'); o.className='opt';
       o.innerHTML='<div class="label">Color</div>';
       const c=document.createElement('div'); c.className='chips'; o.appendChild(c);
-      const draw=()=>chipRow(c, keys.map(k=>({id:k,label:k})), sel.color, k=>{ sel.color=k; draw(); const nm=mediaEl(p.colors[k], atClub(p)?'At Casa Hirostar':p.tag, p.name, atClub(p)); media.replaceWith(nm); media=nm; });
+      const draw=()=>chipRow(c, keys.map(k=>({id:k,label:k})), sel.color, k=>{ sel.color=k; draw(); const nm=mediaEl(p.colors[k], atClub(p)?'In store':p.tag, p.name, atClub(p)); media.replaceWith(nm); media=nm; });
       draw(); right.appendChild(o);
     }
     let err;
