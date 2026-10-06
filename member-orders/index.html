@@ -71,6 +71,8 @@ header p{margin:0;max-width:52ch;color:var(--soft);font-size:16px}
 .perk b{font-family:var(--CA);font-style:italic;font-weight:400;font-size:clamp(32px,8vw,44px);line-height:1}
 .perk span{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;opacity:.85}
 .perks .note{flex-basis:100%}
+.promo{flex-basis:100%;margin:4px 0 0;font-size:14px;border:1px solid var(--green);border-radius:999px;padding:9px 16px;width:fit-content;max-width:100%}
+.promo b{font-family:var(--CA);font-style:italic;font-weight:400;font-size:18px;margin-right:4px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{border:1px solid var(--green);border-radius:999px;padding:8px 16px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;transition:background .15s,color .15s}
 .chip[aria-pressed="true"]{background:var(--green);color:var(--cream)}
@@ -220,13 +222,8 @@ footer .caslon{font-size:20px;color:var(--green)}
     <div class="perk"><b>20% off</b><span>Players members</span></div>
     <div class="perk"><b>30% off</b><span>Founding members</span></div>
     <p class="note">Every item shows both member prices. Pick your membership at checkout to see your total savings. We'll match it to your PlayByPoint account at pickup.</p>
+    <p class="promo"><b>50% off</b> all Joola and OWL pickleball paddles, for everyone. In store while they last.</p>
   </section>
-
-  <section class="details" aria-label="Hirostar">
-    <q>With Hirostar, the difference is in the details.</q>
-    <span>Italian racquets and apparel, at home on the Canal Walk.</span>
-  </section>
-
   <div class="filters">
     <div class="chips" id="brandChips" aria-label="Brand"></div>
     <div class="chips" id="catChips" aria-label="Category"></div>
@@ -473,7 +470,8 @@ function addShopOnly(it){
   let brand = (n.match(/^(wilson|hirostar|adidas|joola|head|bullpadel|babolat|nox|siux)\b/i)||[])[1] || (/\bowl\b/i.test(n) ? 'OWL' : (cat==='Racquets' ? 'Hirostar' : 'Pickleball'));
   brand = brand.charAt(0).toUpperCase()+brand.slice(1).toLowerCase(); if (brand==='Owl') brand='OWL';
   let name = n.replace(new RegExp('^(the\\s+)?'+brand+'\\s+','i'),'').replace(/\s+-\s+.*$/,'').replace(/\s+(padel\s+)?(paddles?|racket|racquet)$/i,'').replace(/\s+padel$/i,'').replace(/\bV3 V3\b/,'V3').trim() || n;
-  SHOP_ONLY.push({id:'ts-'+it.guid, brand, cat, name, sub: cat==='Pickleball' ? 'Pickleball paddle \u00b7 in the pro shop' : 'Padel racquet \u00b7 in the pro shop', price: it.price, img: it.image || '', shopOnly: true});
+  const sale = (cat==='Pickleball' && /^(joola|owl)$/i.test(brand)) ? 0.5 : 0;
+  SHOP_ONLY.push({sale, id:'ts-'+it.guid, brand, cat, name, sub: cat==='Pickleball' ? 'Pickleball paddle \u00b7 in the pro shop' : 'Padel racquet \u00b7 in the pro shop', price: it.price, img: it.image || '', shopOnly: true});
 }
 
 /* ========================================================= */
@@ -535,6 +533,19 @@ function renderFilters(){
 
 function priceBlock(p, big){
   const w = document.createElement('div'); w.className='prices'+(big?' big':'');
+  if (p.sale){
+    const reg = document.createElement('div'); reg.className='reg';
+    const a=document.createElement('span'); a.className='amt'; a.textContent=money(offPrice(p.price,p.sale));
+    const l=document.createElement('span'); l.className='lbl'; l.innerHTML='<s></s>'; l.querySelector('s').textContent=money(p.price);
+    reg.append(a,l); w.appendChild(reg);
+    const r=document.createElement('div'); r.className='mrow top';
+    const who=document.createElement('span'); who.className='who'; who.textContent='Everyone \u00b7 '+Math.round(p.sale*100)+'% off';
+    const mp=document.createElement('span'); mp.className='mp'; mp.textContent=money(offPrice(p.price,p.sale));
+    const sv=document.createElement('span'); sv.className='sv'; sv.textContent='Save '+money(Math.round((p.price-offPrice(p.price,p.sale))*100)/100);
+    r.append(who,mp,sv); w.appendChild(r);
+    const n=document.createElement('div'); n.className='reg'; n.innerHTML='<span class="lbl">Sale price for members and guests. In store only.</span>'; w.appendChild(n);
+    return w;
+  }
   const reg = document.createElement('div'); reg.className='reg';
   const a=document.createElement('span'); a.className='amt'; a.textContent=money(p.price);
   const l=document.createElement('span'); l.className='lbl'; l.textContent='Regular price';
@@ -574,7 +585,7 @@ function renderCatalog(){
     items.forEach(p=>{
       shown++;
       const card=document.createElement('button'); card.type='button'; card.className='card';
-      card.appendChild(mediaEl(firstImg(p), atClub(p)?'In store':p.tag, p.name, atClub(p)));
+      card.appendChild(mediaEl(firstImg(p), p.sale ? Math.round(p.sale*100)+'% off' : (atClub(p)?'In store':p.tag), p.name, atClub(p)));
       const br=document.createElement('div'); br.className='brand'; br.textContent=p.brand; card.appendChild(br);
       const t=document.createElement('h3'); t.textContent=p.name; card.appendChild(t);
       const s=document.createElement('p'); s.className='sub'; s.textContent=p.sub; card.appendChild(s);
