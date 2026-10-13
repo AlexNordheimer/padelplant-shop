@@ -222,6 +222,7 @@ footer .caslon{font-size:20px;color:var(--green)}
     <div class="perk"><b>20% off</b><span>Players members</span></div>
     <div class="perk"><b>30% off</b><span>Founding members</span></div>
     <p class="note">Every item shows both member prices. Pick your membership at checkout to see your total savings. We'll match it to your PlayByPoint account at pickup.</p>
+    <p class="promo"><b>New</b> the Here to Serve hat, plus Padel Plant hats, crewnecks and hoodies. In store now.</p>
     <p class="promo"><b>50% off</b> all Joola and OWL pickleball paddles, for everyone. In store while they last.</p>
   </section>
   <div class="filters">
@@ -438,7 +439,7 @@ async function loadStock(){
     renderAll();
   }catch(e){ state.stockLoaded = true; state.where = 'online'; renderAll(); }
 }
-const CATS = ['Racquets','Pickleball','Shoes','Apparel','Bags & accessories'];
+const CATS = ['Padel Plant merch','Racquets','Pickleball','Shoes','Apparel','Bags & accessories'];
 
 /* Racquets and pickleball paddles in Toast's Retail menu that aren't in the online catalog.
    They show only under "In store" and are bought at the front desk. */
@@ -457,8 +458,32 @@ function addShopShoe(it, model){
   if (it.price > p.price) p.price = it.price;
   const sz = sizeOf(it.name); if (sz) p.shopSizes.add(sz);
 }
+/* Padel Plant's own merch from Toast. One card per model; colors and sizes are rolled up. */
+const MERCH_MODELS = [
+  {re:/here to serve/i, name:'Here to Serve Hat', sub:'Heron hat · new in the pro shop', featured:true},
+  {re:/green crewneck/i, name:'Padel Plant Crewneck', sub:'Green crewneck sweatshirt'},
+  {re:/padel plant hoodie/i, name:'Padel Plant Hoodie', sub:'Hoodie in cream or black'},
+  {re:/padel plant green t-?shirt/i, name:'Padel Plant Tee', sub:'Green t-shirt'},
+  {re:/padel plant logo hat/i, name:'Padel Plant Logo Hat', sub:'White or black'},
+  {re:/schematic hat/i, name:'Plant Schematic Hat', sub:'White or black'},
+  {re:/smokestack logo hat/i, name:'Smokestack Logo Hat', sub:'Light or dark green'},
+  {re:/^bucket hat/i, name:'Bucket Hat', sub:'Padel Plant bucket hat'},
+  {re:/^beanie/i, name:'Beanie', sub:'Padel Plant beanie'},
+  {re:/plant totes?/i, name:'The Plant Tote', sub:'Canvas tote bag'}
+];
+function addShopMerch(it, model){
+  const id = 'ts-merch-'+norm(model.name).replace(/ /g,'-');
+  let p = SHOP_ONLY.find(x=>x.id===id);
+  if (!p){ p = {id, brand:'Padel Plant', cat:'Padel Plant merch', name:model.name, sub:model.sub, price:0, img:'', shopOnly:true, shopSizes:new Set(), featured:!!model.featured, tag:model.featured?'New':''}; SHOP_ONLY.push(p); }
+  if (it.price > p.price) p.price = it.price;
+  if (!p.img && it.image) p.img = it.image;
+  const m = (it.name||'').match(/-\s*(xs|s|m|l|xl|xxl|small|medium|large)\b/i);
+  if (m){ const v=m[1].toLowerCase(); p.shopSizes.add(SIZE_WORDS[v] || v.toUpperCase()); }
+}
 function addShopOnly(it){
   const n = it.name || ''; const g = it.group || '';
+  const merch = MERCH_MODELS.find(m=>m.re.test(n.trim()));
+  if (merch){ addShopMerch(it, merch); return; }
   const model = SHOE_MODELS.find(m=>m.re.test(n.trim()));
   if (model){ addShopShoe(it, model); return; }
   if (!(it.price > 0) || /rental|ball|overgrip|grip|bag|backpack|shoe|tee|shirt|hat|hoodie|tank|skirt|short|tote|glass/i.test(n)) return;
@@ -573,7 +598,8 @@ function mediaEl(src, tag, label, club){
 
 function renderCatalog(){
   const main = $('#catalog'); main.innerHTML='';
-  const list = PRODUCTS.filter(p=>(state.brand==='All'||p.brand===state.brand)&&(state.cat==='All'||p.cat===state.cat)&&(state.where==='shop' ? atClub(p) : !p.shopOnly)).sort((a,b)=>atClub(b)-atClub(a));
+  const list = PRODUCTS.filter(p=>(state.brand==='All'||p.brand===state.brand)&&(state.cat==='All'||p.cat===state.cat)&&(state.where==='shop' ? atClub(p) : !p.shopOnly))
+    .sort((a,b)=>(!!b.featured-!!a.featured)||(atClub(b)-atClub(a)));
   const cats = state.cat==='All' ? CATS : [state.cat];
   let shown = 0;
   cats.forEach(c=>{
@@ -585,7 +611,7 @@ function renderCatalog(){
     items.forEach(p=>{
       shown++;
       const card=document.createElement('button'); card.type='button'; card.className='card';
-      card.appendChild(mediaEl(firstImg(p), p.sale ? Math.round(p.sale*100)+'% off' : (atClub(p)?'In store':p.tag), p.name, atClub(p)));
+      card.appendChild(mediaEl(firstImg(p), p.sale ? Math.round(p.sale*100)+'% off' : p.featured ? 'New' : (atClub(p)?'In store':p.tag), p.name, atClub(p)));
       const br=document.createElement('div'); br.className='brand'; br.textContent=p.brand; card.appendChild(br);
       const t=document.createElement('h3'); t.textContent=p.name; card.appendChild(t);
       const s=document.createElement('p'); s.className='sub'; s.textContent=p.sub; card.appendChild(s);
