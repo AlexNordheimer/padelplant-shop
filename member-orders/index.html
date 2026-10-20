@@ -301,6 +301,77 @@ const PRODUCTS = [
   ...WILSON()
 ];
 
+/* Wilson moved its store to Shopify (Oct 2026), so the old wilson.com/media image links stopped working.
+   Old links are rewritten to the new Shopify files by Wilson article code. Add a line here if a new Wilson item shows "Photo coming". */
+const WILSON_CDN = 'https://cdn.shopify.com/s/files/1/0996/7373/5482/files/';
+const WILSON_IMG = {
+  'WR186411U':'WR186411U_0_Bela_Pro_v3_Black_Red_png_black_01.png',
+  'WR186511U':'WR186511U_0_Bela_v3_Black_Red_png_blackRed_01.png',
+  'WR186711U':'WR186711U_0_Bela_LS_v3_Black_Red_png_whiteRed_01.png',
+  'WR213911U':'WR213911U_0_DEFY_PRO_V1_SE_White_Black_Gold_png_whiteGold_01.png',
+  'WR190311U':'WR190311U_0_ENDURE_PRO_V1_DarkBlue_Black_DarkBlue_NO_STRAP_png_blueBlack_01.png',
+  'WR190411U':'WR190411U_0_ENDURE_V1_DarkBlue_Black_LightBlue_NO_STRAP_png_blueBlack_01.png',
+  'WR190511U':'WR190511U_0_ENDURE_LS_V1_LightBlue_Black_LightBlue_NO_STRAP_png_blueBlack_01.png',
+  'WR203611U':'WR203611U_0_Blade_v4_DarkGreen_png_green_01.png',
+  'WR203711U':'WR203711U_0_Blade_v4_LS_G_MintGreen_png_mint_01.png',
+  'WR190811U':'WR190811U_0_OPTIX_V2_POWER_RED_Grey_Red_1_png_red_01.png',
+  'WR190711U':'WR190711U_0_OPTIX_V2_LITE_WHITE_White_Beige_png_white_01.png',
+  'WR213811U':'WR213811U_0_Blade_v4_JR_BrightGreen_png_green_01.png',
+  'WRS338740':'WRS338480_0_Rush_Pro_5_DejaVuBlue_White_Black_png_dejaVuBlueWhiteBlack_01.png',
+  'WRS340980':'WRS340980_0_Courtglide_Padel_Black_White_LunarRock_png_blackWhiteLunarRock_01.png',
+  'WRS340970':'WRS340970_0_Courtglide_Padel_W_White_Bay_SkipperBlue_png_whiteBaySkipperBlue_01.png',
+  'WR8913001':'WR8913001_0_Padel_Super_Tour_Red_Red_png_red_01.png',
+  'WR8910801':'WR8910801_0_BELA_V3_PADEL_RACKET_BAG_Black_Red_png_blackRed_01.png',
+  'WR8909001':'WR8909001_0_TOUR_RED_BAG_Red_png_red_01.png',
+  'WR8912901':'WR8912901_0_Padel_Super_Tour_Backpack_Red_png_red_01.png',
+  'WR8909101':'WR8909101_0_TOUR_RED_PADEL_BACKPACK_Red_png_red_01.png',
+  'WR8908701':'WR8908701_0_TEAM_PADEL_BAG_Grey_Red_png_black_01.png',
+  'WM00307411WTA':'WM00307411WTA_7_LEAGUE_POLO_M_WTA_png_brightWhite_01.png',
+  'WM00507531WTA':'WM00507531WTA_7_CHALLENGERS_TECHNICAL_POLO_M_WTA_png_brightWhite_01.png',
+  'WM00011411GNG':'WM00011411GNG_7_EVERYDAY_PERFORMANCE_TEE_M_GNG_fieldGreenBrightWhite_01.png',
+  'WM00011531WTA':'WM00011531WTA_7_EVERYDAY_PERFORMANCE_TEE_M_WTA_png_brightWhite_01.png',
+  'WM00240E040002':'WM00240E040002_7_M_BREAKPOINT_SEAMLESS_TEE_M_PINE_GROVE_png_pineGrove_01.png',
+  'WM00240331WTA':'WM00240331WTA_7_BREAKPOINT_SEAMLESS_TEE_9_M_WTA_png_brightWhiteWhite_01.png',
+  'WM00502511NVD':'WM00502511NVD_7_TOURNAMENT_SHORT_V2_7_UNLINED_M_NVD_png_sycamore_01.png',
+  'WM00502511WTA':'WM00502511WTA_7_TOURNAMENT_SHORT_V2_7_UNLINED_M_WTA_png_brightWhite_01.png',
+  'WN00308E040001':'WN00308E040001_7_M_CLASSIC_COURT_SHORT_7IN_M_PINE_GROVE_png_pineGrove_01.png',
+  'WM00305531WTA':'WM00305531WTA_7_EVERYDAY_PERFORMANCE_HALFZIP_M_WTA_png_brightWhite_01.png',
+  'WN00078E040001':'WN00078E040001_7_M_CLASSIC_WARM_UP_JACKET_M_PINE_GROVE_png_pineGrove_01.png',
+  'WM00251531DYF':'WM00251531DYF_7_WILSON_AMERICA_CREW_SWEATSHIRT_M_DYF_png_stadiumGreen_01.png',
+  'WW00014511GNG':'WW00014511GNG_7_ESSEX_POLO_W_GNG_png_fieldGreen_01.png',
+  'WW00014331WTA':'WW00014331WTA_7_ESSEX_POLO_W_BRIGHT_WHITE_png_brightWhite_01.png',
+  'WW00160331GNG':'WW00160331GNG_7_MIDTOWN_SKIRT_W_GNG_png_fieldGreen_01.png',
+  'WW00160331WT1':'WW00160331WT1_7_MIDTOWN_SKIRT_BRIGHT_WHITE_W_WT1_png_brightWhite_01.png',
+  'WW00311511GNG':'WW00311511GNG_7_CLASSIC_PLEATED_MINI_SKIRT_W_GNG_png_fieldGreen_01.png',
+  'WW00387411WTA':'WW00387411WTA_7_CLASSIC_PLEATED_MINI_SKIRT_W_WAT_png_brightWhite_01.png',
+  'WW00156E001001':'WW00156E001001_7_FIELDHOUSE_TANK_W_FIELD_GREEN_png_fieldGreen_01.png',
+  'WW00024431WTA':'WW00024431WTA_7_PRO_SEAMLESS_TANK_W_WTA_png_brightWhite_01.png',
+  'WW00015331GNG':'WW00015331GNG_7_EVERYDAY_BRAMI_W_GNG_png_fieldGreen_01.png',
+  'WW00015331WTA':'WW00015331WTA_7_EVERYDAY_BRAMI_W_WTA_png_brightWhite_01.png',
+  'WE00075E001001':'WE00075E001001_7_DOUBLES_PLAY_DRESS_W_FIELD_GREEN_png_fieldGreen_01.png',
+  'WW00431511WTA':'WW00431511WTA_7_ALL_DAY_HALFZIP_W_WTA_png_brightWhite_01.png',
+  'WRS331580':'WRS331580_0_Bela_Tour_White_Infrared_Black_png_whiteInfraredBlack_01.png',
+  'WRS335560':'WRS335560_0_Hurakn_Pro_V2_White_DejaVuBlue_Black_png_whiteDejaVuBlueBlack_01.png',
+  'WRS336940':'WRS336940_0_Intrigue_Tour_Padel_White_AmparoBlue_SftyYell_png_whiteAmparoBlueSafetyYellow_01.png'
+};
+function wilsonImg(u){
+  if (!u || u.indexOf('/article_images/') < 0) return u;
+  const code = u.split('/article_images/')[1].split('/')[0].replace(/_+$/,'');
+  return WILSON_IMG[code] ? WILSON_CDN + WILSON_IMG[code] + '?width=600' : u;
+}
+PRODUCTS.forEach(p => {
+  if (p.img) p.img = wilsonImg(p.img);
+  if (p.colors) Object.keys(p.colors).forEach(c => { p.colors[c] = wilsonImg(p.colors[c]); });
+});
+/* Photos for in-store items whose Toast entry has no picture (Toast photos win when added). */
+const SHOP_ONLY_IMG = [
+  [/^wilson defy v1/i, WILSON_CDN + 'WR173711U_0_DEFY_V1_PADEL_png_blackGold_01.png?width=600'],
+  [/^wilson defy ls ?v1/i, WILSON_CDN + 'WR173811U_0_Defy_LS_V1_Padel_RKT_Black_Gold_png_blackGold_01.png?width=600'],
+  [/^wilson optix white/i, WILSON_CDN + 'WR190711U_0_OPTIX_V2_LITE_WHITE_White_Beige_png_white_01.png?width=600'],
+  [/^nox jma/i, 'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/pala-pickleball-x-foam-jma-16mm-palas-pickleball-ppixfojma26nox-8910291.png?v=1769512320']
+];
+const shopOnlyImg = n => { const hit = SHOP_ONLY_IMG.find(([re]) => re.test(String(n||'').trim())); return hit ? hit[1] : ''; };
+
 function WILSON(){
   const IMG = 'https://www.wilson.com/en-us/media/catalog/product/article_images/';
   const Q = '?quality=80&bg-color=F3F1ED&fit=bounds&height=600&width=600';
@@ -450,7 +521,7 @@ const SHOE_MODELS = [
   {re:/^hurakn pro v2/i, name:'Hurakn Pro V2', sub:"Men's padel shoe", img:'WRS335560_/WRS335560__bc5e276fa63a4213ae889c5c8a20e3a6.png'},
   {re:/^hurakn 2\.0/i, name:'Hurakn 2.0', sub:"Men's padel shoe", img:''}
 ];
-const WIMG = x => x ? 'https://www.wilson.com/en-us/media/catalog/product/article_images/'+x+'?quality=80&bg-color=F3F1ED&fit=bounds&height=600&width=600' : '';
+const WIMG = x => x ? wilsonImg('https://www.wilson.com/en-us/media/catalog/product/article_images/'+x) : '';
 function addShopShoe(it, model){
   const id = 'ts-shoe-'+norm(model.name).replace(/ /g,'-');
   let p = SHOP_ONLY.find(x=>x.id===id);
@@ -496,7 +567,7 @@ function addShopOnly(it){
   brand = brand.charAt(0).toUpperCase()+brand.slice(1).toLowerCase(); if (brand==='Owl') brand='OWL';
   let name = n.replace(new RegExp('^(the\\s+)?'+brand+'\\s+','i'),'').replace(/\s+-\s+.*$/,'').replace(/\s+(padel\s+)?(paddles?|racket|racquet)$/i,'').replace(/\s+padel$/i,'').replace(/\bV3 V3\b/,'V3').trim() || n;
   const sale = (cat==='Pickleball' && /^(joola|owl)$/i.test(brand)) ? 0.5 : 0;
-  SHOP_ONLY.push({sale, id:'ts-'+it.guid, brand, cat, name, sub: cat==='Pickleball' ? 'Pickleball paddle \u00b7 in the pro shop' : 'Padel racquet \u00b7 in the pro shop', price: it.price, img: it.image || '', shopOnly: true});
+  SHOP_ONLY.push({sale, id:'ts-'+it.guid, brand, cat, name, sub: cat==='Pickleball' ? 'Pickleball paddle \u00b7 in the pro shop' : 'Padel racquet \u00b7 in the pro shop', price: it.price, img: it.image || shopOnlyImg(n), shopOnly: true});
 }
 
 /* ========================================================= */
