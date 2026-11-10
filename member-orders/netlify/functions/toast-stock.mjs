@@ -46,10 +46,18 @@ export default async () => {
     const items = [];
     (menus.menus || []).forEach(m => collect(m, want, false, items));
 
+    // Stock: items with a count or marked out of stock (GET), plus a per-item search as a cross-check.
     const stock = {};
+    const diag = { inventory: null, inventoryFound: 0, search: [], searchFound: 0 };
+    const inv = await fetch(host + '/stock/v1/inventory', { headers });
+    diag.inventory = inv.status;
+    if (inv.ok) (await inv.json()).forEach(s => { stock[s.guid] = s; diag.inventoryFound++; });
     for (let i = 0; i < items.length; i += 100) {
-      const r = await fetch(host + '/stock/v1/inventory/search', { method: 'PUT', headers, body: JSON.stringify({ guids: items.slice(i, i + 100).map(x => x.guid) }) });
-      if (r.ok) (await r.json()).forEach(s => { stock[s.guid] = s; });
+      const body = JSON.stringify({ guids: items.slice(i, i + 100).map(x => x.guid) });
+      let r = await fetch(host + '/stock/v1/inventory/search', { method: 'POST', headers, body });
+      if (!r.ok) r = await fetch(host + '/stock/v1/inventory/search', { method: 'PUT', headers, body });
+      diag.search.push(r.status);
+      if (r.ok) (await r.json()).forEach(s => { diag.searchFound++; if (!stock[s.guid] || s.status !== 'IN_STOCK') stock[s.guid] = s; });
     }
 
     const out = items.map(i => ({
@@ -61,7 +69,7 @@ export default async () => {
       status: stock[i.guid]?.status || 'IN_STOCK',
       quantity: stock[i.guid]?.quantity ?? null
     }));
-    return Response.json({ updated: new Date().toISOString(), menu: want, items: out }, {
+    return Response.json({ updated: new Date().toISOString(), menu: want, stockCheck: diag, items: out }, {
       headers: { 'Cache-Control': 'public, max-age=300', 'Netlify-CDN-Cache-Control': 'public, s-maxage=900, stale-while-revalidate=300' }
     });
   } catch (e) {

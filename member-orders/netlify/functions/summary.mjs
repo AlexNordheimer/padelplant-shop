@@ -21,7 +21,8 @@ export default async (req, context) => {
   try {
     const orders = await fetchOrders(siteIdFrom(context));
     const now = Date.now(), cutoff = lastMondayNoon();
-    let requested = 0, overdue = 0, overdueSince = null, newToday = 0, waiting = 0, waitingSince = null, spam = 0;
+    let requested = 0, overdue = 0, overdueSince = null, newToday = 0, waiting = 0, waitingSince = null, spam = 0, atDesk = 0;
+    const deskMembers = new Set();
     for (const o of orders) {
       const created = new Date(o.created);
       if (o.spam) { if (now - created < 14 * DAY) spam++; continue; }
@@ -31,7 +32,8 @@ export default async (req, context) => {
           requested++;
           if (created < cutoff) { overdue++; if (!overdueSince || created < overdueSince) overdueSince = created; }
         }
-        // Arrived but not picked up for a week (order date stands in for arrival date)
+        if (it.status === 'Arrived') { atDesk += it.qty || 1; deskMembers.add((o.email || o.name || o.id || '').toLowerCase()); }
+        // Arrived but not picked up for two weeks (order date stands in for arrival date)
         if (it.status === 'Arrived' && now - created > 14 * DAY) { waiting++; if (!waitingSince || created < waitingSince) waitingSince = created; }
       }
     }
@@ -44,15 +46,15 @@ export default async (req, context) => {
       title: plural(requested - overdue, 'gear item', 'gear items') + ' requested for next Monday\'s order',
       detail: newToday ? plural(newToday, 'new order', 'new orders') + ' in the last 24 hours.' : 'Goes out with the next weekly order.',
       link: ORDERS, n: requested - overdue, since: null });
-    if (waiting) alerts.push({ key: 'shop-pickup', area: 'Shop', level: 'warn',
-      title: plural(waiting, 'item', 'items') + ' arrived but not picked up',
-      detail: 'Ordered over two weeks ago and still marked Arrived. Remind the member or mark it Picked up.',
-      link: ORDERS, n: waiting, since: waitingSince });
+    if (atDesk) alerts.push({ key: 'shop-pickup', area: 'Shop', level: 'warn',
+      title: plural(atDesk, 'gear item', 'gear items') + ' waiting at the desk for ' + plural(deskMembers.size, 'member', 'members'),
+      detail: 'Marked Arrived and not picked up yet. Print the pickup sheets from the order page.' + (waiting ? ' ' + plural(waiting, 'item has', 'items have') + ' been waiting over two weeks.' : ''),
+      link: ORDERS, n: atDesk, since: waitingSince });
     if (spam) alerts.push({ key: 'shop-spam', area: 'Shop', level: 'warn',
       title: plural(spam, 'order', 'orders') + ' flagged as spam',
       detail: 'Netlify flagged these. Check they aren\'t real member orders.',
       link: ORDERS, n: spam, since: null });
-    return Response.json({ updated_at: new Date().toISOString(), requested, overdue, new_24h: newToday, waiting_pickup: waiting, spam, alerts }, { headers: CORS });
+    return Response.json({ updated_at: new Date().toISOString(), requested, overdue, new_24h: newToday, waiting_pickup: waiting, at_desk: atDesk, at_desk_members: deskMembers.size, spam, alerts }, { headers: CORS });
   } catch (e) {
     return Response.json({ error: String(e.message || e), alerts: [] }, { status: 500, headers: CORS });
   }

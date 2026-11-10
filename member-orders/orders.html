@@ -61,6 +61,33 @@ h2{font-family:var(--CA);font-style:italic;font-weight:400;font-size:28px;margin
 .gate{max-width:420px;margin:12vh auto 0;display:grid;gap:14px}
 .gate input{border:0;border-bottom:1px solid var(--green);background:transparent;padding:10px 0;font-size:18px;width:100%}
 .legend{font-size:12px;color:var(--soft);margin-top:6px}
+/* pickup sheets: one page per member, printed from this page */
+#printArea{display:none}
+@media print{
+  @page{size:letter;margin:.55in}
+  body{background:#fff}
+  body.printing .wrap{display:none}
+  body.printing #printArea{display:block}
+  .ps{page-break-after:always;break-after:page;color:#1f2a20;font-size:12.5pt}
+  .ps:last-child{page-break-after:auto;break-after:auto}
+  .ps .hd{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--green);padding-bottom:8px;margin-bottom:18px}
+  .ps .hd .label{color:var(--green)}
+  .ps h3{font-family:var(--CA);font-style:italic;font-weight:400;font-size:30pt;line-height:1.05;margin:0 0 4px}
+  .ps .who{font-size:12pt;margin-bottom:18px}
+  .ps .who b{font-weight:600}
+  .ps table{width:100%;border-collapse:collapse;margin:6px 0 14px}
+  .ps th{font-size:8.5pt;letter-spacing:.14em;text-transform:uppercase;text-align:left;border-bottom:1px solid #999;padding:6px 6px 6px 0}
+  .ps td{border-bottom:1px solid #ddd;padding:9px 6px 9px 0;vertical-align:top}
+  .ps td.n,.ps th.n{text-align:right;white-space:nowrap}
+  .ps .box{display:inline-block;width:14px;height:14px;border:1.5px solid #333;border-radius:2px;vertical-align:middle}
+  .ps .sub{font-size:10pt;color:#555}
+  .ps .tot{display:flex;justify-content:flex-end;gap:28px;font-size:12.5pt;margin-top:4px}
+  .ps .tot b{font-size:15pt}
+  .ps .how{margin-top:18px;padding:10px 12px;border:1px solid #bbb;border-radius:6px;font-size:10.5pt}
+  .ps .sign{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:28px;font-size:10pt}
+  .ps .sign div{border-top:1px solid #333;padding-top:4px}
+  .ps .list td{padding:7px 6px 7px 0}
+}
 @media (max-width:560px){.row{grid-template-columns:40px minmax(0,1fr)}.right{grid-column:2;justify-items:start;text-align:left}}
 </style>
 </head>
@@ -83,6 +110,7 @@ h2{font-family:var(--CA);font-style:italic;font-weight:400;font-size:28px;margin
     <div class="chips" id="weeks" aria-label="Order week"></div>
     <div class="stats" id="stats"></div>
     <div class="toolbar">
+      <button class="btn" type="button" id="printAll">Print pickup sheets</button>
       <button class="btn ghost" type="button" id="refresh">Refresh</button>
       <a class="link" href="/#feature">Pick featured items</a>
       <button class="link" type="button" id="logout">Sign out</button>
@@ -92,6 +120,7 @@ h2{font-family:var(--CA);font-style:italic;font-weight:400;font-size:28px;margin
   </main>
 
 </div>
+<div id="printArea" aria-hidden="true"></div>
 <script>
 const STATUSES=['Requested','Ordered','Arrived','Picked up'];
 const $=s=>document.querySelector(s);
@@ -233,6 +262,46 @@ function statusPill(status, refs){
   return b;
 }
 
+/* ---------- Pickup sheets (print or save as PDF) ---------- */
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function itemLabel(it){ return it.request ? (it.brand||'')+' request: '+it.request : it.brand+' '+it.product; }
+function itemMeta(it){ return [it.color, it.size?'Size '+it.size:null].filter(Boolean).join(' · '); }
+function printSheets(){
+  // Everything that has arrived and is waiting at the desk, from any order week.
+  const list=orders.filter(o=>!o.spam).map(o=>({...o, items:o.items.filter(it=>it.status==='Arrived')})).filter(o=>o.items.length);
+  if(!list.length){ setMsg('Nothing is waiting at the desk. Mark items Arrived when they come in.'); return; }
+  const today=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const A=$('#printArea'); let h='';
+  // cover: one line per member
+  h+='<section class="ps"><div class="hd"><span class="label">Padel Plant · Pro shop pickups</span><span class="label">Printed '+esc(today)+'</span></div>';
+  h+='<h3>Pickup checklist</h3><div class="who">'+list.length+' member'+(list.length>1?'s':'')+' with gear waiting at the desk. Each member has their own page after this one.</div>';
+  h+='<table class="list"><tr><th></th><th>Member</th><th>Phone</th><th>Membership</th><th class="n">Items</th><th class="n">To charge</th></tr>';
+  list.forEach(o=>{ const n=o.items.reduce((m,i)=>m+(i.qty||1),0); const t=o.items.reduce((m,i)=>m+(i.member_each||0)*(i.qty||1),0);
+    h+='<tr><td><span class="box"></span></td><td><b>'+esc(o.name)+'</b></td><td>'+esc(o.phone)+'</td><td>'+esc(o.membership)+'</td><td class="n">'+n+'</td><td class="n">'+money(t)+(o.items.some(i=>i.request)?' + request':'')+'</td></tr>'; });
+  h+='</table></section>';
+  // one page per member
+  list.forEach(o=>{
+    const reg=o.items.reduce((m,i)=>m+(i.list_each||0)*(i.qty||1),0), mem=o.items.reduce((m,i)=>m+(i.member_each||0)*(i.qty||1),0);
+    h+='<section class="ps"><div class="hd"><span class="label">Padel Plant · Pro shop pickup</span><span class="label">Order of '+esc(o.week||'')+'</span></div>';
+    h+='<h3>'+esc(o.name)+'</h3><div class="who"><b>'+esc(o.membership||'Membership not given')+'</b> · '+esc(o.phone)+' · '+esc(o.email)+'</div>';
+    if(o.notes) h+='<div class="who sub">Note from member: '+esc(o.notes)+'</div>';
+    h+='<table><tr><th>Done</th><th>Item</th><th class="n">Qty</th><th class="n">Regular</th><th class="n">Charge</th><th>Ring up in Toast as</th></tr>';
+    o.items.forEach(it=>{
+      const q=it.qty||1;
+      h+='<tr><td><span class="box"></span></td><td><b>'+esc(itemLabel(it))+'</b>'+(itemMeta(it)?'<div class="sub">'+esc(itemMeta(it))+'</div>':'')+'<div class="sub">Status: '+esc(it.status)+'</div></td>';
+      h+='<td class="n">'+q+'</td><td class="n">'+(it.list_each?money(it.list_each*q):'—')+'</td><td class="n"><b>'+(it.member_each?money(it.member_each*q):'Price TBC')+'</b></td>';
+      h+='<td>Special Order – '+esc(it.brand||'Other')+'</td></tr>';
+    });
+    h+='</table><div class="tot"><span>Regular '+money(reg)+'</span><span>Member price <b>'+money(mem)+'</b></span></div><div class="tot sub">Plus Virginia sales tax</div>';
+    h+='<div class="how"><b>How to ring it up:</b> in Toast, open Retail and add <b>Special Order – [brand]</b> for each item. Type the amount from the Charge column (it already includes their member discount). If the member has already left, create the item on the <b>Merchandise</b> tab in Playbypoint at the same amount and charge it to their account (card on file). Tick Done, then mark the item Picked up on the order sheet.</div>';
+    h+='<div class="sign"><div>Rung up by</div><div>Date</div><div>Paid in: Toast / Playbypoint</div></div></section>';
+  });
+  A.innerHTML=h;
+  document.body.classList.add('printing');
+  setTimeout(()=>window.print(),50);
+}
+window.addEventListener('afterprint',()=>document.body.classList.remove('printing'));
+$('#printAll').onclick=()=>printSheets();
 key ? load() : showGate();
 </script>
 </body>
