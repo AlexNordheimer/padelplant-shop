@@ -149,7 +149,7 @@ async function load(){
   try{
     setMsg('Loading orders…');
     const j=await api('/api/orders');
-    orders=j.orders||[];
+    orders=(j.orders||[]).filter(o=>!o.test || /[?&]showtest/.test(location.search)); // test checkouts only with ?showtest
     $('#gate').hidden=true; $('#app').hidden=false; setMsg('');
     const weeks=[...new Set(orders.map(o=>o.week))];
     weeks.sort((a,b)=>weekDate(b)-weekDate(a));

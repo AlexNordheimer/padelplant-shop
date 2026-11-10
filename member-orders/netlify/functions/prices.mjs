@@ -44,13 +44,13 @@ export default async (req) => {
     for (const p of PRODUCTS) {
       if (p.shopOnly || !(p.price > 0)) continue;
       products[p.id] = {
-        brand: p.brand, name: p.name, sub: p.sub || '', price: p.price,
+        brand: p.brand, name: p.name, sub: p.sub || '', cat: p.cat || '', price: p.price,
         sizes: p.sizes || null, colors: p.colors ? Object.keys(p.colors) : null,
         img: p.colors ? Object.values(p.colors)[0] : (p.img || ''),
         in_store: inStore[p.id] ? { sizes: inStore[p.id].sizes } : null,
       };
     }
-    const tiers = Object.fromEntries(TIERS.filter(t => t.off).map(t => [t.id, { label: t.label, off: t.off }]));
+    const tiers = Object.fromEntries(TIERS.filter(t => t.off).map(t => [t.id, { label: t.label, off: t.off, cats: t.cats || null }]));
     const body = { updated: new Date().toISOString(), stock_ok: !!(stock.items || []).length, cutoff_day: CUTOFF.day, tiers, products };
     cache = { at: Date.now(), body };
     return reply(body);

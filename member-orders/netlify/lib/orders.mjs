@@ -53,6 +53,7 @@ export async function fetchOrders(siteId) {
       name: d.name || '', email: d.email || '', phone: d.phone || '',
       membership: d.membership || '', notes: d.notes || '', spam: !!s._spam,
       payment: d.payment || '', paid: /^Paid online/i.test(d.payment || ''), order_ref: d.order_ref || '',
+      test: /^\[TEST\]/.test(d.name || ''),
       list_total: d.list_total || '', member_total: d.member_total || '',
       items: items.map((it, i) => ({ ...it, idx: i, status: saved[i] || 'Requested' }))
     });
@@ -78,7 +79,7 @@ export async function saveStatuses(updates) {
 // Group a week's orders into one supplier list per brand.
 export function supplierList(orders) {
   const brands = {}, requests = [];
-  orders.forEach(o => o.items.forEach(it => {
+  orders.filter(o => !o.test).forEach(o => o.items.forEach(it => {
     if (it.sku === 'request' || it.request) { requests.push({ ...it, who: o.name, order: o.id }); return; }
     const b = brands[it.brand] = brands[it.brand] || {};
     const key = [it.product, it.color || '', it.size || ''].join('|');

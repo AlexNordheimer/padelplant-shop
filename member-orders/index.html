@@ -229,6 +229,7 @@ img{max-width:100%;display:block}
 .meta.instore{color:var(--green);font-weight:600}
 .signbtn{background:none;border:0;cursor:pointer}
 input[readonly]{opacity:.7}
+.testbar{background:#f6c445;color:#2b3a2d;font-size:12px;font-weight:700;text-align:center;padding:6px 12px}
 @media (max-width:760px){.toplink.signbtn{display:inline-flex;letter-spacing:.1em;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}.tiersel{display:none}}
 .savebig{font-family:var(--CA);font-style:italic;font-size:34px;line-height:1.05}
 .link{font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:4px}
@@ -414,6 +415,7 @@ footer a{text-underline-offset:3px}
 const TIERS = [
   {id:'founding', label:'Founding member', off:0.30},
   {id:'players',  label:'Players member',  off:0.20},
+  {id:'pickleball', label:'Pickleball member', off:0.20, cats:['Apparel','Shoes','Pickleball']},
   {id:'other',    label:'Other / guest',   off:0}
 ];
 const CUTOFF = {day:0}; // Sunday at midnight Eastern
@@ -766,6 +768,8 @@ const state = {
 const tier = () => TIERS.find(t=>t.id===state.tier) || null;
 const offPrice = (p,off) => Math.round(Math.round(p*100)*Math.round((1-off)*100)/100)/100;
 const memberPrice = p => offPrice(p, tier()?tier().off:0);
+// A tier can be limited to some categories (Pickleball members: apparel, shoes and pickleball paddles)
+const offFor = (t,p) => !t || !t.off ? 0 : (t.cats && !(p && t.cats.includes(p.cat)) ? 0 : t.off);
 const PLAYERS = TIERS.find(t=>t.id==='players'), FOUNDING = TIERS.find(t=>t.id==='founding');
 const firstImg = p => p.img || (p.colors ? Object.values(p.colors)[0] : '');
 
@@ -825,8 +829,8 @@ function priceLine(p){
   const w=document.createElement('div'); w.className='pline';
   const b=document.createElement('b'); w.appendChild(b);
   const tr=tier();
-  if (!p.sale && tr && tr.off){
-    b.textContent=money(offPrice(p.price,tr.off));
+  if (!p.sale && offFor(tr,p)){
+    b.textContent=money(offPrice(p.price,offFor(tr,p)));
     const s=document.createElement('s'); s.textContent=money(p.price); w.appendChild(s);
     return w;
   }
@@ -1009,7 +1013,8 @@ function priceBlock(p, big){
   const a=document.createElement('span'); a.className='amt'; a.textContent=money(p.price);
   const l=document.createElement('span'); l.className='lbl'; l.textContent='Regular price';
   reg.append(a,l); w.appendChild(reg);
-  [FOUNDING, PLAYERS].forEach((t,k)=>{
+  const PICKLE = TIERS.find(t=>t.id==='pickleball');
+  [FOUNDING, PLAYERS].concat(offFor(PICKLE,p)?[PICKLE]:[]).forEach((t,k)=>{
     const r=document.createElement('div'); r.className='mrow'+(k===0?' top':'');
     const who=document.createElement('span'); who.className='who'; who.textContent=t.label.replace(' member','');
     const mp=document.createElement('span'); mp.className='mp'; mp.textContent=money(offPrice(p.price,t.off));
@@ -1124,7 +1129,7 @@ function lineInfo(l){
   if (l.pid==='request') return {name:l.brand+' request', meta:l.text, img:'', list:0, member:0, brand:l.brand};
   const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return null;
   const meta=[l.color&&l.color!=='Standard'?l.color:null, l.size?('Size '+l.size):null, l.qty>1?('Qty '+l.qty):null].filter(Boolean).join(' · ');
-  return {name:p.brand+' '+p.name+(/^(Women|Men)'s/.test(p.sub)?' ('+p.sub.match(/^(Women|Men)'s/)[0]+')':''), meta, img:p.colors&&l.color?p.colors[l.color]:p.img, list:p.price*l.qty, member:memberPrice(p.price)*l.qty, brand:p.brand};
+  return {name:p.brand+' '+p.name+(/^(Women|Men)'s/.test(p.sub)?' ('+p.sub.match(/^(Women|Men)'s/)[0]+')':''), meta, img:p.colors&&l.color?p.colors[l.color]:p.img, list:p.price*l.qty, member:offPrice(p.price,offFor(tier(),p))*l.qty, brand:p.brand};
 }
 function addToBag(line){
   const same = state.bag.find(l=>l.pid===line.pid && l.color===line.color && l.size===line.size && line.pid!=='request');
@@ -1140,10 +1145,10 @@ function toast(line){
   requestAnimationFrame(()=>t.classList.add('show'));
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3800);
 }
-function totals(off){
-  if (off===undefined) off = tier()?tier().off:0;
+function totals(t){
+  if (t===undefined) t = tier();
   let list=0, member=0, count=0;
-  state.bag.forEach(l=>{ count+=l.qty; const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return; list+=p.price*l.qty; member+=offPrice(p.price,off)*l.qty; });
+  state.bag.forEach(l=>{ count+=l.qty; const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return; list+=p.price*l.qty; member+=offPrice(p.price,offFor(t,p))*l.qty; });
   return {list:Math.round(list*100)/100, member:Math.round(member*100)/100, save:Math.round((list-member)*100)/100, count};
 }
 function renderBag(){
@@ -1151,7 +1156,7 @@ function renderBag(){
   $('#bagbar').hidden = !state.bag.length;
   $('#bagN').textContent = t.count;
   $('#bagCount').textContent = t.count+(t.count===1?' item':' items');
-  const best=totals(FOUNDING.off);
+  const best=totals(FOUNDING);
   $('#bagTotal').textContent = best.save>0 ? 'Save up to '+money(best.save) : money(t.list);
 }
 $('#openBag').addEventListener('click',openReview);
@@ -1162,17 +1167,18 @@ window.addEventListener('hashchange',()=>{ if(location.hash==='#feature' && !sta
 /* ---------- member sign-in (email code) and checkout (Stripe) ----------
    Backend: Supabase function "shop" (or "shop-test" after visiting ?shoptest=1). It checks the
    member's Playbypoint membership for the discount and recomputes every price itself. */
-const TESTMODE = (()=>{ try{ const q=new URLSearchParams(location.search).get('shoptest'); if(q!==null) sessionStorage.setItem('shoptest', q==='0'?'':'1'); return !!sessionStorage.getItem('shoptest'); }catch(e){ return false; } })();
+// Previews (anything that isn't shop.padelplant.com) always use Stripe test mode.
+const TESTMODE = location.hostname!=='shop.padelplant.com' || (()=>{ try{ const q=new URLSearchParams(location.search).get('shoptest'); if(q!==null) sessionStorage.setItem('shoptest', q==='0'?'':'1'); return !!sessionStorage.getItem('shoptest'); }catch(e){ return false; } })();
 const SHOP_API = 'https://uwguwwsppevxzmqcloro.supabase.co/functions/v1/' + (TESTMODE ? 'shop-test' : 'shop');
 async function api(action, body){
-  const r = await fetch(SHOP_API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action, ...(body||{})})});
+  const r = await fetch(SHOP_API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action, shop:location.origin, ...(body||{})})});
   const j = await r.json().catch(()=>({error:'Something went wrong. Try again.'}));
   if (!r.ok || j.error) throw new Error(j.error || ('Error '+r.status));
   return j;
 }
 state.auth = store.get('auth', null);
 const payTier = () => state.auth && state.auth.tier ? TIERS.find(t=>t.id===state.auth.tier) || null : null;
-const payOff = () => payTier() ? payTier().off : 0;
+const payOff = p => offFor(payTier(), p);
 function setAuth(a){
   state.auth = a; store.set('auth', a);
   if (a && a.tier) setTier(a.tier);
@@ -1212,14 +1218,14 @@ function openAccount(){
   openSheet(body=>{
     const w=document.createElement('div'); w.className='review'; body.appendChild(w);
     if (!state.auth){
-      w.innerHTML='<div class="label" style="color:var(--soft)">Members</div><h2>Sign in</h2><p class="fine" style="margin-top:6px">We’ll email you a code. Your Players or Founding member price is applied automatically, and you stay signed in on this device.</p>';
+      w.innerHTML='<div class="label" style="color:var(--soft)">Members</div><h2>Sign in</h2><p class="fine" style="margin-top:6px">We’ll email you a code. Your member price is applied automatically, and you stay signed in on this device.</p>';
       w.appendChild(signInBox(()=>{ closeSheet(); renderAll(); renderBag(); }));
       return;
     }
     const a=state.auth;
     w.innerHTML='<div class="label" style="color:var(--soft)">Signed in</div><h2></h2><p class="fine" style="margin-top:6px"></p>';
     w.querySelector('h2').textContent=a.name||a.email;
-    w.querySelector('p').textContent = a.tier_label ? a.tier_label+' prices are applied at checkout ('+a.email+').' : 'We couldn’t find an active Players or Founding membership for '+a.email+', so regular prices apply. Think that’s wrong? Ask at the front desk.';
+    w.querySelector('p').textContent = a.tier_label ? a.tier_label+' prices are applied at checkout ('+a.email+').' : 'We couldn’t find a membership with shop savings for '+a.email+', so regular prices apply. Think that’s wrong? Ask at the front desk.';
     const out=document.createElement('button'); out.type='button'; out.className='link'; out.textContent='Sign out';
     out.onclick=async()=>{ try{ await api('sign_out',{token:a.token}); }catch(e){} setAuth(null); setTier('other'); closeSheet(); };
     w.appendChild(out);
@@ -1227,6 +1233,7 @@ function openAccount(){
 }
 $('#signBtn').addEventListener('click', openAccount);
 renderAuth();
+if (TESTMODE){ const tb=document.createElement('div'); tb.className='testbar'; tb.textContent='Test mode: payments use Stripe test cards (4242 4242 4242 4242). Nothing is really charged.'; document.body.prepend(tb); }
 if (state.auth && state.auth.token) api('me',{token:state.auth.token}).then(j=>{
   if (!j.signed_in) { setAuth(null); return; }
   setAuth({...state.auth, email:j.email, name:j.name||state.auth.name, tier:j.tier, tier_label:j.tier_label});
@@ -1246,7 +1253,6 @@ function openReview(notice){
     const draw=()=>{
       lines.innerHTML='';
       if(!state.bag.length){ lines.innerHTML='<p class="empty">Your order is empty.</p>'; tot.innerHTML=''; acct.innerHTML=''; send.hidden=true; return; }
-      const off=payOff();
       state.bag.forEach((l,idx)=>{
         const i=lineInfo(l); if(!i) return;
         const p=PRODUCTS.find(x=>x.id===l.pid);
@@ -1259,17 +1265,17 @@ function openReview(notice){
         r.appendChild(mid);
         const rt=document.createElement('div'); rt.className='rt';
         if (l.pid==='request') rt.innerHTML='<div class="meta">Price to confirm</div>';
-        else { const list=p.price*l.qty, mem=offPrice(p.price,off)*l.qty; rt.innerHTML='<div>'+money(mem)+'</div>'+(off?'<div class="meta"><s>'+money(list)+'</s></div>':''); }
+        else { const off=payOff(p), list=p.price*l.qty, mem=offPrice(p.price,off)*l.qty; rt.innerHTML='<div>'+money(mem)+'</div>'+(off?'<div class="meta"><s>'+money(list)+'</s></div>':''); }
         const rm=document.createElement('button'); rm.type='button'; rm.className='rm'; rm.textContent='Remove';
         rm.onclick=()=>{ state.bag.splice(idx,1); store.set('bag',state.bag); renderBag(); draw(); };
         rt.appendChild(rm); r.appendChild(rt);
         lines.appendChild(r);
       });
       drawAcct();
-      const t=totals(off), hasPriced=priced().length;
+      const t=totals(payTier()), hasPriced=priced().length;
       tot.innerHTML = !hasPriced ? '<div class="small">Special requests aren’t charged now. We’ll confirm a price with you before we order.</div>'
-        : (off ? '<div class="savebig">You save '+money(t.save)+'</div><div class="big">'+money(t.member)+'</div><div class="small">'+payTier().label+' price · regular '+money(t.list)+'</div>'
-               : '<div class="big">'+money(t.list)+'</div><div class="small">Regular price</div>')
+        : (t.save>0 ? '<div class="savebig">You save '+money(t.save)+'</div><div class="big">'+money(t.member)+'</div><div class="small">'+payTier().label+' price · regular '+money(t.list)+'</div>'
+               : '<div class="big">'+money(t.list)+'</div><div class="small">Regular price'+(payTier()&&payTier().cats?' (your Pickleball member savings apply to apparel, shoes and paddles)':'')+'</div>')
           + '<div class="small">Virginia sales tax is added at checkout</div>';
       send.hidden=false;
       send.textContent = hasPriced ? 'Continue to payment' : 'Send my request';
@@ -1283,13 +1289,13 @@ function openReview(notice){
         const a=state.auth, d=document.createElement('div'); d.className='who';
         d.innerHTML='<b></b><span></span>';
         d.querySelector('b').textContent = a.tier_label ? a.tier_label+' prices applied' : 'Signed in';
-        d.querySelector('span').textContent = a.tier_label ? 'Signed in as '+a.email : 'No active Players or Founding membership found for '+a.email+', so regular prices apply.';
+        d.querySelector('span').textContent = a.tier_label ? 'Signed in as '+a.email+(a.tier==='pickleball'?' \u00b7 20% off apparel, shoes and paddles':'') : 'No membership with shop savings found for '+a.email+', so regular prices apply.';
         const o=document.createElement('button'); o.type='button'; o.className='link'; o.textContent='Not you? Sign out';
         o.onclick=async()=>{ try{ await api('sign_out',{token:a.token}); }catch(e){} setAuth(null); em.readOnly=false; draw(); };
         d.appendChild(o); acct.appendChild(d);
       } else {
         const q=document.createElement('div'); q.className='q'; q.textContent='Members, sign in for your price'; acct.appendChild(q);
-        const sub=document.createElement('p'); sub.className='small'; sub.style.margin='0 0 4px'; sub.textContent='Players save 20%, Founding members 30%. Not a member? Skip this and check out below at the regular price.'; acct.appendChild(sub);
+        const sub=document.createElement('p'); sub.className='small'; sub.style.margin='0 0 4px'; sub.textContent='Players save 20%, Founding members 30%, Pickleball members 20% on apparel, shoes and paddles. Not a member? Skip this and check out below at the regular price.'; acct.appendChild(sub);
         acct.appendChild(signInBox(()=>{ em.value=state.auth.email; em.readOnly=true; if(!nm.value && state.auth.name) nm.value=state.auth.name; draw(); }));
       }
     };

@@ -25,6 +25,7 @@ export default async (req, context) => {
     const deskMembers = new Set();
     for (const o of orders) {
       const created = new Date(o.created);
+      if (o.test) continue; // test checkouts from previews
       if (o.spam) { if (now - created < 14 * DAY) spam++; continue; }
       if (now - created < DAY) newToday++;
       for (const it of o.items) {
