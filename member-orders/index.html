@@ -1145,10 +1145,10 @@ function toast(line){
   requestAnimationFrame(()=>t.classList.add('show'));
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3800);
 }
-function totals(t){
+function totals(t, skipInStore){
   if (t===undefined) t = tier();
   let list=0, member=0, count=0;
-  state.bag.forEach(l=>{ count+=l.qty; const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return; list+=p.price*l.qty; member+=offPrice(p.price,offFor(t,p))*l.qty; });
+  state.bag.forEach(l=>{ count+=l.qty; const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return; if(skipInStore && inStoreVariant(l.pid,l.size)) return; list+=p.price*l.qty; member+=offPrice(p.price,offFor(t,p))*l.qty; });
   return {list:Math.round(list*100)/100, member:Math.round(member*100)/100, save:Math.round((list-member)*100)/100, count};
 }
 function renderBag(){
@@ -1272,7 +1272,7 @@ function openReview(notice){
         lines.appendChild(r);
       });
       drawAcct();
-      const t=totals(payTier()), hasPriced=priced().length;
+      const t=totals(payTier(), true), hasPriced=priced().length;
       tot.innerHTML = !hasPriced ? '<div class="small">Special requests aren’t charged now. We’ll confirm a price with you before we order.</div>'
         : (t.save>0 ? '<div class="savebig">You save '+money(t.save)+'</div><div class="big">'+money(t.member)+'</div><div class="small">'+payTier().label+' price · regular '+money(t.list)+'</div>'
                : '<div class="big">'+money(t.list)+'</div><div class="small">Regular price'+(payTier()&&payTier().cats?' (your Pickleball member savings apply to apparel, shoes and paddles)':'')+'</div>')
