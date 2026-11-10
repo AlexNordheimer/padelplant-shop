@@ -52,6 +52,7 @@ export async function fetchOrders(siteId) {
       week: d.order_week || 'Unscheduled',
       name: d.name || '', email: d.email || '', phone: d.phone || '',
       membership: d.membership || '', notes: d.notes || '', spam: !!s._spam,
+      payment: d.payment || '', paid: /^Paid online/i.test(d.payment || ''), order_ref: d.order_ref || '',
       list_total: d.list_total || '', member_total: d.member_total || '',
       items: items.map((it, i) => ({ ...it, idx: i, status: saved[i] || 'Requested' }))
     });
