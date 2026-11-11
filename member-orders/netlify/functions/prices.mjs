@@ -30,13 +30,14 @@ export default async (req) => {
     const byId = Object.fromEntries(PRODUCTS.map(p => [p.id, p]));
     const inStore = {}; const priced = new Set();
     for (const it of stock.items || []) {
-      if (it.status === 'OUT_OF_STOCK') continue;
-      if (it.status === 'QUANTITY' && !(it.quantity > 0)) continue;
       const n = norm(it.name);
       const hit = TOAST_LINK.find(([pre]) => n.startsWith(norm(pre)));
       const p = hit && byId[hit[1]];
       if (!p) continue;
+      // same price as in store, even when it's sold out there
       if (it.price > 0 && !priced.has(p.id)) { p.price = it.price; priced.add(p.id); }
+      if (it.status === 'OUT_OF_STOCK') continue;
+      if (it.status === 'QUANTITY' && !(it.quantity > 0)) continue;
       const s = inStore[p.id] || (inStore[p.id] = { sizes: [] });
       const sz = sizeOf(it.name); if (sz && !s.sizes.includes(sz)) s.sizes.push(sz);
     }
