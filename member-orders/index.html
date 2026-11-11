@@ -75,29 +75,36 @@ img{max-width:100%;display:block}
 }
 .bagbtn .n{min-width:22px;height:22px;border-radius:11px;background:var(--green);color:var(--cream);display:inline-grid;place-items:center;font-size:11px;letter-spacing:0;padding:0 6px}
 
-/* hero band */
-.hero{background:var(--green);color:var(--cream);margin-inline:-20px;padding:22px 20px 26px}
-@media (min-width:900px){.hero{margin-inline:-32px;padding:34px 32px 36px}}
-.hero .in{max-width:1440px;margin:0 auto;display:grid;gap:18px}
-@media (min-width:980px){.hero .in{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);align-items:end;gap:48px}}
-.hero .label{opacity:.85;display:flex;align-items:center;gap:8px}
-.hero h1{font-family:var(--CA);font-weight:400;font-size:clamp(34px,4.4vw,58px);line-height:1;margin:10px 0 12px;letter-spacing:-.015em}
+/* hero: cream, so it doesn't run into the green nav */
+.hero{color:var(--green);padding:30px 0 22px;border-bottom:1px solid var(--faint)}
+@media (min-width:900px){.hero{padding:44px 0 30px}}
+.hero .in{max-width:1440px;margin:0 auto;display:grid;gap:22px}
+@media (min-width:980px){.hero .in{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:center;gap:56px}}
+.hero h1{font-family:var(--CA);font-weight:400;font-size:clamp(36px,4.6vw,60px);line-height:1;margin:0 0 14px;letter-spacing:-.015em}
 .hero h1 i{font-style:italic}
-.hero p{margin:0;max-width:56ch;font-size:15px;opacity:.92}
-.hero .ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.hero p{margin:0;max-width:48ch;font-size:15.5px;color:var(--ink)}
+.paths{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:640px){.paths{grid-template-columns:1fr 1fr}}
+.path{display:flex;flex-direction:column;gap:6px;text-decoration:none;border-radius:16px;padding:18px 18px 16px;background:#fff;border:1px solid var(--faint);color:var(--green);transition:border-color .15s,transform .15s}
+.path:hover{border-color:var(--green);transform:translateY(-1px)}
+.path.dark{background:var(--green);color:var(--cream);border-color:var(--green)}
+.path .k{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;opacity:.75}
+.path b{font-family:var(--CA);font-style:italic;font-weight:400;font-size:25px;line-height:1.1}
+.path .d{font-size:13.5px;line-height:1.45;color:var(--ink)}
+.path.dark .d{color:inherit;opacity:.9}
+.path .go{margin-top:auto;padding-top:10px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .pill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px 20px;font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;white-space:nowrap}
 .pill.solid{background:var(--cream);color:var(--green)}
-.pill.line{display:inline-flex;padding:12px 20px;border-bottom:0;box-shadow:inset 0 0 0 1px rgba(254,243,229,.55);color:var(--cream)}
-.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:rgba(254,243,229,.2);border:1px solid rgba(254,243,229,.2);border-radius:14px;overflow:hidden}
-.facts > div,.facts > button{background:var(--green);padding:12px 16px}
-.facts b{display:block;font-family:var(--CA);font-style:italic;font-weight:400;font-size:28px;line-height:1}
-.facts span{display:block;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;opacity:.85;margin-top:6px}
-.facts .wide{grid-column:1/-1;font-size:13px;line-height:1.45}
-.facts .wide b{font-family:var(--HG);font-style:normal;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:4px}
-.cutoff{display:inline-flex;align-items:center;gap:8px}
+.memberrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:22px;font-size:13px;color:var(--soft)}
+.facts{display:flex;gap:8px;flex-wrap:wrap}
+.facts button{display:inline-flex;align-items:baseline;gap:8px;border:1px solid var(--faint);background:#fff;border-radius:999px;padding:8px 14px;color:var(--green);text-align:left;transition:background .15s,border-color .15s}
+.facts button:hover{border-color:var(--green)}
+.facts button[aria-pressed="true"]{background:var(--green);color:var(--cream);border-color:var(--green)}
+.facts b{font-family:var(--CA);font-style:italic;font-weight:400;font-size:19px;line-height:1}
+.facts span{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.cutoff{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--green)}
 .cutoff::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
-@media (max-width:699px){.hero p{font-size:14px}.facts b{font-size:22px}.facts > div,.facts > button{padding:10px 14px}.facts .wide{font-size:12.5px}
-  .hero .ctas{display:grid;grid-template-columns:1fr 1fr}.hero .ctas .pill,.hero .ctas .pill.line{padding:12px 10px;letter-spacing:.12em}
+@media (max-width:699px){.hero p{font-size:14.5px}.path b{font-size:22px}
   .promos{flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none;font-size:12.5px}.promos::-webkit-scrollbar{display:none}}
 .promos{display:flex;flex-wrap:wrap;gap:6px 22px;padding:12px 0;font-size:13px;color:var(--soft);border-bottom:1px solid var(--faint)}
 .promos b{font-family:var(--CA);font-style:italic;font-weight:400;font-size:16px;color:var(--green);margin-right:4px}
@@ -142,10 +149,6 @@ img{max-width:100%;display:block}
 .tiersel select{background:transparent;color:var(--cream);border:1px solid rgba(254,243,229,.45);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:600;letter-spacing:0;text-transform:none}
 .tiersel select option{color:var(--green)}
 @media (max-width:640px){.tiersel span{display:none}.tiersel select{max-width:118px}}
-.facts button{text-align:left;color:inherit;transition:background .15s}
-.facts button:hover{background:rgba(254,243,229,.08)}
-.facts button[aria-pressed="true"]{background:var(--cream);color:var(--green)}
-.facts button[aria-pressed="true"] span::after{content:" \00b7  your prices"}
 @media (max-width:640px){.toolbar{gap:0 12px}.tb-right{flex-wrap:nowrap;gap:8px;width:100%}.tb-count{display:none}.seg button{padding:7px 10px;letter-spacing:.1em}.sel{flex:1;min-width:0}}
 
 /* product grid: compact cards, more per row */
@@ -324,19 +327,20 @@ footer a{text-underline-offset:3px}
   <section class="hero">
     <div class="in">
       <div>
-        <div class="label">The pro shop &middot; Casa Hirostar</div>
         <h1>Gear up at <i>the Plant.</i></h1>
-        <p>Shop what's on our shelves, or order the full Hirostar, Wilson and Nox range and we'll bring it in. Members always save.</p>
-        <div class="ctas">
-          <a class="pill solid" href="#shopAll" data-where="shop">Shop in store</a>
-          <a class="pill line" href="#shopAll" data-where="online">Order online</a>
-        </div>
+        <p>Casa Hirostar is the pro shop at Padel Plant. See what's on our shelves right now, or order anything from Hirostar, Wilson and Nox through us. Members save either way.</p>
       </div>
+      <div class="paths">
+        <a class="path" href="#shopAll" data-where="shop"><span class="k">In house</span><b>See our inventory</b><span class="d">What's on the shelves at Padel Plant today. Try it on, take it home.</span><span class="go">View in store &rarr;</span></a>
+        <a class="path dark" href="#shopAll" data-where="online"><span class="k">From our partners</span><b>Shop online</b><span class="d">The full Hirostar, Wilson and Nox lines. We order Mondays and text you when it's at the front desk, usually in 1 to 2 weeks.</span><span class="go">Shop the full range &rarr;</span></a>
+      </div>
+    </div>
+    <div class="memberrow">
       <div class="facts" aria-label="Member savings">
         <button type="button" data-tier="players"><b>20% off</b><span>Players members</span></button>
         <button type="button" data-tier="founding"><b>30% off</b><span>Founding members</span></button>
-        <div class="wide"><b class="cutoff" id="cutoff"></b>We place orders every Monday. Pick up and pay at the front desk, nothing is charged online.</div>
       </div>
+      <span class="cutoff" id="cutoff"></span>
     </div>
   </section>
   <div class="promos">
@@ -366,7 +370,7 @@ footer a{text-underline-offset:3px}
   <section class="how" aria-label="How ordering works">
     <h2>How ordering <i>works</i></h2>
     <ol>
-      <li><b>Browse</b><span>Everything marked In store is on our shelves now. Switch to Order online for the full Hirostar, Wilson and Nox range.</span></li>
+      <li><b>Browse</b><span>In house is what's on our shelves now. Shop online for the full Hirostar, Wilson and Nox lines.</span></li>
       <li><b>Send your order</b><span>by Sunday at midnight. Nothing is charged online.</span></li>
       <li><b>We order Monday</b><span>Most orders arrive in 1 to 2 weeks. We text you when it's at the front desk.</span></li>
       <li><b>Pick up and pay</b><span>in store. Your member price is applied at the desk.</span></li>
@@ -673,7 +677,7 @@ async function loadStock(){
     renderAll();
   }catch(e){ state.stockLoaded = true; state.where = 'online'; renderAll(); }
 }
-const CATS = ['Padel Plant merch','Racquets','Pickleball','Shoes','Apparel','Bags & accessories'];
+const CATS = ['Racquets','Padel Plant merch','Pickleball','Shoes','Apparel','Bags & accessories'];
 
 /* Racquets and pickleball paddles in Toast's Retail menu that aren't in the online catalog.
    They show only under "In store" and are bought at the front desk. */
@@ -761,7 +765,7 @@ function orderWindow(){
 const fmtDay = d => d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 function renderCutoff(){
   const {cut} = orderWindow();
-  $('#cutoff').textContent = 'Order by ' + fmtDay(cut) + ', midnight';
+  $('#cutoff').textContent = 'Next online order closes ' + fmtDay(cut) + ' at midnight';
 }
 
 /* chips */
@@ -780,7 +784,7 @@ function chipRow(el, items, current, onPick){
 /* filters: category tabs, in store / online, brand */
 function renderFilters(){
   const seg=$('#whereSeg'); seg.innerHTML='';
-  [{id:'shop',label:'In store'},{id:'online',label:'Order online'}].forEach(o=>{
+  [{id:'shop',label:'In house'},{id:'online',label:'Shop online'}].forEach(o=>{
     const b=document.createElement('button'); b.type='button'; b.textContent=o.label; b.setAttribute('aria-pressed', String(state.where===o.id));
     b.onclick=()=>{ state.where=o.id; renderFilters(); renderCatalog(); }; seg.appendChild(b);
   });
