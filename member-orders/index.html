@@ -1236,38 +1236,32 @@ function setAuth(a){
 function renderAuth(){
   const b=$('#signBtn'); if(!b) return;
   const a=state.auth;
-  b.textContent = a ? ((a.name||'').split(' ')[0] || 'My account') + (a.tier_label ? ' · '+a.tier_label.replace(/ member$/,'') : '') : 'Member sign in';
+  b.textContent = a ? ((a.name||'').split(' ')[0] || 'My account') + (a.tier_label ? ' · '+a.tier_label.replace(/ member$/,'') : '') : 'Member prices';
 }
 function signInBox(onDone){
+  // Members are matched by the email or mobile number on their Padel Plant account. No code to wait for.
   const box=document.createElement('div'); box.className='signin';
-  let email = (state.me && state.me.email) || '';
-  const step1=()=>{
-    box.innerHTML='<label for="si-email">Email on your Padel Plant account</label><div class="row"><input id="si-email" type="email" autocomplete="email"><button type="button" class="btn">Send code</button></div><p class="err" role="alert"></p>';
-    const i=box.querySelector('input'), b=box.querySelector('button'), e=box.querySelector('.err'); i.value=email;
-    const go=async()=>{ email=i.value.trim(); e.textContent=''; if(!/^\S+@\S+\.\S+$/.test(email)){ e.textContent='Enter your email.'; i.focus(); return; }
-      b.disabled=true; b.textContent='Sending…';
-      try{ await api('send_code',{email}); step2(); }catch(x){ e.textContent=x.message; b.disabled=false; b.textContent='Send code'; } };
-    b.onclick=go; i.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); go(); } };
-  };
-  const step2=()=>{
-    box.innerHTML='<label for="si-code"></label><div class="row"><input id="si-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"><button type="button" class="btn">Sign in</button></div><p class="err" role="alert"></p><button type="button" class="link again">Use a different email</button>';
-    box.querySelector('label').textContent='Enter the 6-digit code we sent to '+email;
-    const i=box.querySelector('input'), b=box.querySelector('.btn'), e=box.querySelector('.err');
-    box.querySelector('.again').onclick=step1;
-    const go=async()=>{ e.textContent=''; b.disabled=true; b.textContent='Checking…';
-      try{ const a=await api('verify_code',{email, code:i.value}); setAuth({token:a.token, email:a.email, name:a.name, tier:a.tier, tier_label:a.tier_label}); onDone && onDone(); }
-      catch(x){ e.textContent=x.message; b.disabled=false; b.textContent='Sign in'; } };
-    b.onclick=go; i.oninput=()=>{ if(i.value.replace(/\D/g,'').length===6) go(); };
-    setTimeout(()=>i.focus(),50);
-  };
-  step1();
+  box.innerHTML='<label for="si-email">Email</label><input id="si-email" type="email" autocomplete="email">'
+    +'<label for="si-phone" style="margin-top:10px">Mobile number</label><div class="row"><input id="si-phone" type="tel" autocomplete="tel"><button type="button" class="btn">Get my price</button></div><p class="err" role="alert"></p>';
+  const ie=box.querySelector('#si-email'), ip=box.querySelector('#si-phone'), b=box.querySelector('button'), e=box.querySelector('.err');
+  ie.value=(state.me&&state.me.email)||''; ip.value=(state.me&&state.me.phone)||'';
+  const go=async()=>{ const email=ie.value.trim(), phone=ip.value.trim(); e.textContent='';
+    if(!/^\S+@\S+\.\S+$/.test(email)){ e.textContent='Enter your email.'; ie.focus(); return; }
+    b.disabled=true; b.textContent='Checking…';
+    try{
+      const a=await api('match',{email, phone});
+      state.me={...(state.me||{}), email, phone: phone||((state.me||{}).phone||'')}; store.set('me',state.me);
+      if(!a.matched){ e.textContent='We couldn’t find a membership for that email or number. Try the one you use for Playbypoint, or check out at the regular price.'; b.disabled=false; b.textContent='Get my price'; return; }
+      setAuth({token:a.token, email:a.email, name:a.name, tier:a.tier, tier_label:a.tier_label}); onDone && onDone();
+    }catch(x){ e.textContent=x.message; b.disabled=false; b.textContent='Get my price'; } };
+  b.onclick=go; [ie,ip].forEach(i=>i.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); go(); } });
   return box;
 }
 function openAccount(){
   openSheet(body=>{
     const w=document.createElement('div'); w.className='review'; body.appendChild(w);
     if (!state.auth){
-      w.innerHTML='<div class="label" style="color:var(--soft)">Members</div><h2>Sign in</h2><p class="fine" style="margin-top:6px">We’ll email you a code. Your member price is applied automatically, and you stay signed in on this device.</p>';
+      w.innerHTML='<div class="label" style="color:var(--soft)">Members</div><h2>Get your member price</h2><p class="fine" style="margin-top:6px">Enter your email and mobile number. We match either one to your Padel Plant membership, apply your price, and remember you on this device.</p>';
       w.appendChild(signInBox(()=>{ closeSheet(); renderAll(); renderBag(); }));
       return;
     }
@@ -1343,7 +1337,7 @@ function openReview(notice){
         o.onclick=async()=>{ try{ await api('sign_out',{token:a.token}); }catch(e){} setAuth(null); em.readOnly=false; draw(); };
         d.appendChild(o); acct.appendChild(d);
       } else {
-        const q=document.createElement('div'); q.className='q'; q.textContent='Members, sign in for your price'; acct.appendChild(q);
+        const q=document.createElement('div'); q.className='q'; q.textContent='Members, get your price'; acct.appendChild(q);
         const sub=document.createElement('p'); sub.className='small'; sub.style.margin='0 0 4px'; sub.textContent='Players save 20%, Founding members 30%, Pickleball members 20% on apparel, shoes and paddles. Not a member? Skip this and check out below at the regular price.'; acct.appendChild(sub);
         acct.appendChild(signInBox(()=>{ em.value=state.auth.email; em.readOnly=true; if(!nm.value && state.auth.name) nm.value=state.auth.name; draw(); }));
       }
