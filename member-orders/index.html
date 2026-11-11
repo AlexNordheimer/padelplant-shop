@@ -219,6 +219,21 @@ img{max-width:100%;display:block}
 .tieropt .tt{font-family:var(--CA);font-size:24px;grid-row:1/3;grid-column:2;text-align:right}
 .tieropt .ts{font-size:13px}
 .tieropt[aria-pressed="true"]{background:var(--green);color:var(--cream)}
+.signin{display:grid;gap:8px;margin:6px 0 4px}
+.signin label{font-size:12px;font-weight:600}
+.signin .row{display:flex;gap:10px;flex-wrap:wrap}
+.signin input{flex:1 1 200px;min-width:0;border:1px solid var(--faint);border-radius:14px;background:#fff;padding:12px 14px;font-size:16px}
+.signin .btn{flex:0 0 auto}
+.signin .again{justify-self:start}
+.who{display:grid;gap:4px;border:1px solid var(--green);border-radius:14px;padding:14px 18px}
+.who b{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.who span{font-size:13px}
+.who .link{justify-self:start;margin-top:4px}
+.meta.instore{color:var(--green);font-weight:600}
+.signbtn{background:none;border:0;cursor:pointer}
+input[readonly]{opacity:.7}
+.testbar{background:#f6c445;color:#2b3a2d;font-size:12px;font-weight:700;text-align:center;padding:6px 12px}
+@media (max-width:760px){.toplink.signbtn{display:inline-flex;letter-spacing:.1em;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}.tiersel{display:none}}
 .savebig{font-family:var(--CA);font-style:italic;font-size:34px;line-height:1.05}
 .link{font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:4px}
 .empty{padding:40px 0;color:var(--soft)}
@@ -307,6 +322,7 @@ footer a{text-underline-offset:3px}
   <input name="membership"><input name="order_week"><input name="item_count">
   <input name="list_total"><input name="member_total"><textarea name="items"></textarea>
   <textarea name="items_json"></textarea><textarea name="notes"></textarea>
+  <input name="payment"><input name="order_ref">
 </form>
 
 
@@ -318,6 +334,7 @@ footer a{text-underline-offset:3px}
       <a class="toplink" href="https://www.padelplant.com">padelplant.com</a>
       <a class="toplink" href="#shopAll" id="shopAllLink">Shop all</a>
       <label class="tiersel"><span>Prices for</span><select id="tierSel" aria-label="Show prices for"><option value="">Guests</option><option value="players">Players members</option><option value="founding">Founding members</option></select></label>
+      <button type="button" class="toplink signbtn" id="signBtn">Member sign in</button>
       <button type="button" class="bagbtn" id="bagBtn" aria-label="Open your bag"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="bl">Bag</span><span class="n" id="bagN">0</span></button>
     </div>
   </div>
@@ -402,6 +419,7 @@ footer a{text-underline-offset:3px}
 const TIERS = [
   {id:'founding', label:'Founding member', off:0.30},
   {id:'players',  label:'Players member',  off:0.20},
+  {id:'pickleball', label:'Pickleball member', off:0.20, cats:['Apparel','Shoes','Pickleball']},
   {id:'other',    label:'Other / guest',   off:0}
 ];
 const CUTOFF = {day:0}; // Sunday at midnight Eastern
@@ -649,6 +667,10 @@ const BRANDS = ['Hirostar','Nox','Wilson'];
 const AT_CLUB = {
 };
 const atClub = p => Object.prototype.hasOwnProperty.call(AT_CLUB, p.id);
+/* What's on the shelf, per online product: list of sizes in store ([] = the item itself, no sizes).
+   Anything on the shelf is bought at the front desk, not online. */
+const IN_STORE = {};
+const inStoreVariant = (pid,size) => { const s=IN_STORE[pid]; if(!s) return false; return !s.length || (!!size && s.includes(size)); };
 
 /* Live stock from Toast (served by the Netlify function at /api/stock).
    TOAST_LINK pins a Toast item name to a product id when the automatic match can't tell them apart. */
@@ -711,6 +733,7 @@ async function loadStock(){
     Object.entries(found).forEach(([id,f])=>{
       if (id.startsWith('ts-')) return;
       const sizes = sortSizes([...f.sizes]);
+      IN_STORE[id] = sizes;
       AT_CLUB[id] = sizes.length ? 'In store in size'+(sizes.length>1?'s ':' ')+sizes.join(', ')
                   : f.counted && f.qty <= 2 ? 'Only '+Math.floor(f.qty)+' left in store'
                   : 'In stock in store';
@@ -792,6 +815,8 @@ const state = {
 const tier = () => TIERS.find(t=>t.id===state.tier) || null;
 const offPrice = (p,off) => Math.round(Math.round(p*100)*Math.round((1-off)*100)/100)/100;
 const memberPrice = p => offPrice(p, tier()?tier().off:0);
+// A tier can be limited to some categories (Pickleball members: apparel, shoes and pickleball paddles)
+const offFor = (t,p) => !t || !t.off ? 0 : (t.cats && !(p && t.cats.includes(p.cat)) ? 0 : t.off);
 const PLAYERS = TIERS.find(t=>t.id==='players'), FOUNDING = TIERS.find(t=>t.id==='founding');
 const firstImg = p => p.img || (p.colors ? Object.values(p.colors)[0] : '');
 
@@ -851,8 +876,8 @@ function priceLine(p){
   const w=document.createElement('div'); w.className='pline';
   const b=document.createElement('b'); w.appendChild(b);
   const tr=tier();
-  if (!p.sale && tr && tr.off){
-    b.textContent=money(offPrice(p.price,tr.off));
+  if (!p.sale && offFor(tr,p)){
+    b.textContent=money(offPrice(p.price,offFor(tr,p)));
     const s=document.createElement('s'); s.textContent=money(p.price); w.appendChild(s);
     return w;
   }
@@ -888,6 +913,7 @@ function cardEl(p){
   if (!state.staffPick){
     const q=document.createElement('button'); q.type='button'; q.className='quick';
     if (p.shopOnly){ q.textContent='In store only'; q.classList.add('muted'); }
+    else if (!p.sizes && inStoreVariant(p.id,null)){ q.textContent='Buy in store'; q.classList.add('muted'); q.onclick=e=>{ e.stopPropagation(); openProduct(p); }; }
     else if (p.sizes || (p.colors && Object.keys(p.colors).length>1)){ q.textContent='Choose options'; q.onclick=e=>{ e.stopPropagation(); openProduct(p); }; }
     else { q.textContent='+ Add to bag'; q.onclick=e=>{ e.stopPropagation(); addToBag({pid:p.id, color:p.colors?Object.keys(p.colors)[0]:null, size:null, qty:1}); }; }
     m.appendChild(q);
@@ -1034,7 +1060,8 @@ function priceBlock(p, big){
   const a=document.createElement('span'); a.className='amt'; a.textContent=money(p.price);
   const l=document.createElement('span'); l.className='lbl'; l.textContent='Regular price';
   reg.append(a,l); w.appendChild(reg);
-  [FOUNDING, PLAYERS].forEach((t,k)=>{
+  const PICKLE = TIERS.find(t=>t.id==='pickleball');
+  [FOUNDING, PLAYERS].concat(offFor(PICKLE,p)?[PICKLE]:[]).forEach((t,k)=>{
     const r=document.createElement('div'); r.className='mrow'+(k===0?' top':'');
     const who=document.createElement('span'); who.className='who'; who.textContent=t.label.replace(' member','');
     const mp=document.createElement('span'); mp.className='mp'; mp.textContent=money(offPrice(p.price,t.off));
@@ -1075,6 +1102,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !$('#sheet').hid
 
 function openProduct(p){
   const sel = {color: p.colors ? Object.keys(p.colors)[0] : null, size:null, qty:1};
+  let syncAdd = ()=>{};
   openSheet(body=>{
     const d=document.createElement('div'); d.className='detail'; body.appendChild(d);
     const left=document.createElement('div'); d.appendChild(left);
@@ -1083,7 +1111,7 @@ function openProduct(p){
     const br=document.createElement('div'); br.className='label'; br.style.color='var(--soft)'; br.textContent=p.brand+' · '+p.cat; right.appendChild(br);
     const h=document.createElement('h2'); h.textContent=p.name; right.appendChild(h);
     const s=document.createElement('p'); s.className='desc'; s.textContent=p.sub+(p.colorNote?' \u00b7 '+p.colorNote:''); right.appendChild(s);
-    if (atClub(p)){ const n=document.createElement('p'); n.className='clubnote'; n.style.margin='-4px 0 16px'; n.innerHTML='<b></b><span></span>'; n.querySelector('b').textContent=(AT_CLUB[p.id]||'In stock in store'); n.querySelector('span').textContent=p.shopOnly?'Come by the front desk to try it and buy it. Member prices apply.':'Grab it at the front desk today, or add it to this week\u2019s order below.'; right.appendChild(n); }
+    if (atClub(p)){ const n=document.createElement('p'); n.className='clubnote'; n.style.margin='-4px 0 16px'; n.innerHTML='<b></b><span></span>'; n.querySelector('b').textContent=(AT_CLUB[p.id]||'In stock in store'); n.querySelector('span').textContent=p.shopOnly?'Come by the front desk to try it and buy it. Member prices apply.':((IN_STORE[p.id]||[]).length?' Sizes on the shelf are bought at the front desk. Order any other size below.':' It\u2019s on the shelf, so buy it at the front desk. Member prices apply.'); right.appendChild(n); }
     const pb=priceBlock(p,true); pb.style.marginBottom='20px'; right.appendChild(pb);
     if (p.shopOnly) return;
 
@@ -1100,7 +1128,7 @@ function openProduct(p){
       const o=document.createElement('div'); o.className='opt';
       o.innerHTML='<div class="label">Size</div>';
       const c=document.createElement('div'); c.className='chips'; o.appendChild(c);
-      const draw=()=>chipRow(c, p.sizes.map(k=>({id:k,label:k})), sel.size, k=>{ sel.size=k; draw(); if(err) err.textContent=''; });
+      const draw=()=>chipRow(c, p.sizes.map(k=>({id:k,label:k})), sel.size, k=>{ sel.size=k; draw(); if(err) err.textContent=''; syncAdd(); });
       draw(); right.appendChild(o);
     }
     const q=document.createElement('div'); q.className='opt';
@@ -1115,8 +1143,11 @@ function openProduct(p){
 
     const add=document.createElement('button'); add.type='button'; add.className='btn'; add.textContent='Add to order';
     err=document.createElement('p'); err.className='err'; err.setAttribute('role','alert');
+    syncAdd=()=>{ const st=inStoreVariant(p.id, sel.size); add.disabled=st; add.textContent=st?'In store \u00b7 buy at the desk':'Add to order'; };
+    syncAdd();
     add.onclick=()=>{
       if (p.sizes && !sel.size){ err.textContent='Pick a size first.'; return; }
+      if (inStoreVariant(p.id, sel.size)) return;
       addToBag({pid:p.id, color:sel.color, size:sel.size, qty:sel.qty});
       closeSheet();
     };
@@ -1145,7 +1176,7 @@ function lineInfo(l){
   if (l.pid==='request') return {name:l.brand+' request', meta:l.text, img:'', list:0, member:0, brand:l.brand};
   const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return null;
   const meta=[l.color&&l.color!=='Standard'?l.color:null, l.size?('Size '+l.size):null, l.qty>1?('Qty '+l.qty):null].filter(Boolean).join(' · ');
-  return {name:p.brand+' '+p.name+(/^(Women|Men)'s/.test(p.sub)?' ('+p.sub.match(/^(Women|Men)'s/)[0]+')':''), meta, img:p.colors&&l.color?p.colors[l.color]:p.img, list:p.price*l.qty, member:memberPrice(p.price)*l.qty, brand:p.brand};
+  return {name:p.brand+' '+p.name+(/^(Women|Men)'s/.test(p.sub)?' ('+p.sub.match(/^(Women|Men)'s/)[0]+')':''), meta, img:p.colors&&l.color?p.colors[l.color]:p.img, list:p.price*l.qty, member:offPrice(p.price,offFor(tier(),p))*l.qty, brand:p.brand};
 }
 function addToBag(line){
   const same = state.bag.find(l=>l.pid===line.pid && l.color===line.color && l.size===line.size && line.pid!=='request');
@@ -1161,10 +1192,10 @@ function toast(line){
   requestAnimationFrame(()=>t.classList.add('show'));
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3800);
 }
-function totals(off){
-  if (off===undefined) off = tier()?tier().off:0;
+function totals(t, skipInStore){
+  if (t===undefined) t = tier();
   let list=0, member=0, count=0;
-  state.bag.forEach(l=>{ count+=l.qty; const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return; list+=p.price*l.qty; member+=offPrice(p.price,off)*l.qty; });
+  state.bag.forEach(l=>{ count+=l.qty; const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return; if(skipInStore && inStoreVariant(l.pid,l.size)) return; list+=p.price*l.qty; member+=offPrice(p.price,offFor(t,p))*l.qty; });
   return {list:Math.round(list*100)/100, member:Math.round(member*100)/100, save:Math.round((list-member)*100)/100, count};
 }
 function renderBag(){
@@ -1172,7 +1203,7 @@ function renderBag(){
   $('#bagbar').hidden = !state.bag.length;
   $('#bagN').textContent = t.count;
   $('#bagCount').textContent = t.count+(t.count===1?' item':' items');
-  const best=totals(FOUNDING.off);
+  const best=totals(FOUNDING);
   $('#bagTotal').textContent = best.save>0 ? 'Save up to '+money(best.save) : money(t.list);
 }
 $('#openBag').addEventListener('click',openReview);
@@ -1180,101 +1211,197 @@ $('#bagBtn').addEventListener('click',openReview);
 $('#toTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 window.addEventListener('hashchange',()=>{ if(location.hash==='#feature' && !state.staffPick){ state.staffPick=true; renderAll(); renderStaffBar(); } });
 
-function openReview(){
+/* ---------- member sign-in (email code) and checkout (Stripe) ----------
+   Backend: Supabase function "shop" (or "shop-test" after visiting ?shoptest=1). It checks the
+   member's Playbypoint membership for the discount and recomputes every price itself. */
+// Previews (anything that isn't shop.padelplant.com) always use Stripe test mode.
+const TESTMODE = location.hostname!=='shop.padelplant.com' || (()=>{ try{ const q=new URLSearchParams(location.search).get('shoptest'); if(q!==null) sessionStorage.setItem('shoptest', q==='0'?'':'1'); return !!sessionStorage.getItem('shoptest'); }catch(e){ return false; } })();
+const SHOP_API = 'https://uwguwwsppevxzmqcloro.supabase.co/functions/v1/' + (TESTMODE ? 'shop-test' : 'shop');
+async function api(action, body){
+  const r = await fetch(SHOP_API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action, shop:location.origin, ...(body||{})})});
+  const j = await r.json().catch(()=>({error:'Something went wrong. Try again.'}));
+  if (!r.ok || j.error) throw new Error(j.error || ('Error '+r.status));
+  return j;
+}
+state.auth = store.get('auth', null);
+const payTier = () => state.auth && state.auth.tier ? TIERS.find(t=>t.id===state.auth.tier) || null : null;
+const payOff = p => offFor(payTier(), p);
+function setAuth(a){
+  state.auth = a; store.set('auth', a);
+  if (a && a.tier) setTier(a.tier);
+  renderAuth();
+}
+function renderAuth(){
+  const b=$('#signBtn'); if(!b) return;
+  const a=state.auth;
+  b.textContent = a ? ((a.name||'').split(' ')[0] || 'My account') + (a.tier_label ? ' · '+a.tier_label.replace(/ member$/,'') : '') : 'Member sign in';
+}
+function signInBox(onDone){
+  const box=document.createElement('div'); box.className='signin';
+  let email = (state.me && state.me.email) || '';
+  const step1=()=>{
+    box.innerHTML='<label for="si-email">Email on your Padel Plant account</label><div class="row"><input id="si-email" type="email" autocomplete="email"><button type="button" class="btn">Send code</button></div><p class="err" role="alert"></p>';
+    const i=box.querySelector('input'), b=box.querySelector('button'), e=box.querySelector('.err'); i.value=email;
+    const go=async()=>{ email=i.value.trim(); e.textContent=''; if(!/^\S+@\S+\.\S+$/.test(email)){ e.textContent='Enter your email.'; i.focus(); return; }
+      b.disabled=true; b.textContent='Sending…';
+      try{ await api('send_code',{email}); step2(); }catch(x){ e.textContent=x.message; b.disabled=false; b.textContent='Send code'; } };
+    b.onclick=go; i.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); go(); } };
+  };
+  const step2=()=>{
+    box.innerHTML='<label for="si-code"></label><div class="row"><input id="si-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"><button type="button" class="btn">Sign in</button></div><p class="err" role="alert"></p><button type="button" class="link again">Use a different email</button>';
+    box.querySelector('label').textContent='Enter the 6-digit code we sent to '+email;
+    const i=box.querySelector('input'), b=box.querySelector('.btn'), e=box.querySelector('.err');
+    box.querySelector('.again').onclick=step1;
+    const go=async()=>{ e.textContent=''; b.disabled=true; b.textContent='Checking…';
+      try{ const a=await api('verify_code',{email, code:i.value}); setAuth({token:a.token, email:a.email, name:a.name, tier:a.tier, tier_label:a.tier_label}); onDone && onDone(); }
+      catch(x){ e.textContent=x.message; b.disabled=false; b.textContent='Sign in'; } };
+    b.onclick=go; i.oninput=()=>{ if(i.value.replace(/\D/g,'').length===6) go(); };
+    setTimeout(()=>i.focus(),50);
+  };
+  step1();
+  return box;
+}
+function openAccount(){
+  openSheet(body=>{
+    const w=document.createElement('div'); w.className='review'; body.appendChild(w);
+    if (!state.auth){
+      w.innerHTML='<div class="label" style="color:var(--soft)">Members</div><h2>Sign in</h2><p class="fine" style="margin-top:6px">We’ll email you a code. Your member price is applied automatically, and you stay signed in on this device.</p>';
+      w.appendChild(signInBox(()=>{ closeSheet(); renderAll(); renderBag(); }));
+      return;
+    }
+    const a=state.auth;
+    w.innerHTML='<div class="label" style="color:var(--soft)">Signed in</div><h2></h2><p class="fine" style="margin-top:6px"></p>';
+    w.querySelector('h2').textContent=a.name||a.email;
+    w.querySelector('p').textContent = a.tier_label ? a.tier_label+' prices are applied at checkout ('+a.email+').' : 'We couldn’t find a membership with shop savings for '+a.email+', so regular prices apply. Think that’s wrong? Ask at the front desk.';
+    const out=document.createElement('button'); out.type='button'; out.className='link'; out.textContent='Sign out';
+    out.onclick=async()=>{ try{ await api('sign_out',{token:a.token}); }catch(e){} setAuth(null); setTier('other'); closeSheet(); };
+    w.appendChild(out);
+  }, 'account');
+}
+$('#signBtn').addEventListener('click', openAccount);
+renderAuth();
+if (TESTMODE){ const tb=document.createElement('div'); tb.className='testbar'; tb.textContent='Test mode: payments use Stripe test cards (4242 4242 4242 4242). Nothing is really charged.'; document.body.prepend(tb); }
+if (state.auth && state.auth.token) api('me',{token:state.auth.token}).then(j=>{
+  if (!j.signed_in) { setAuth(null); return; }
+  setAuth({...state.auth, email:j.email, name:j.name||state.auth.name, tier:j.tier, tier_label:j.tier_label});
+}).catch(()=>{});
+
+function openReview(notice){
   openSheet(body=>{
     const w=document.createElement('div'); w.className='review'; body.appendChild(w);
     const {cut, place}=orderWindow();
     w.innerHTML='<div class="label" style="color:var(--soft)">Goes in on '+fmtDay(place)+'</div><h2>Your order</h2>';
+    if (notice){ const n=document.createElement('p'); n.className='err'; n.textContent=notice; w.appendChild(n); }
     const lines=document.createElement('div'); lines.className='lines'; w.appendChild(lines);
+    const acct=document.createElement('div'); acct.className='tiers'; w.appendChild(acct);
     const tot=document.createElement('div'); tot.className='totals'; w.appendChild(tot);
+    const blocked=()=>state.bag.filter(l=>l.pid!=='request' && inStoreVariant(l.pid,l.size));
+    const priced=()=>state.bag.filter(l=>l.pid!=='request');
     const draw=()=>{
       lines.innerHTML='';
-      if(!state.bag.length){ lines.innerHTML='<p class="empty">Your order is empty.</p>'; tot.innerHTML=''; return; }
+      if(!state.bag.length){ lines.innerHTML='<p class="empty">Your order is empty.</p>'; tot.innerHTML=''; acct.innerHTML=''; send.hidden=true; return; }
       state.bag.forEach((l,idx)=>{
         const i=lineInfo(l); if(!i) return;
+        const p=PRODUCTS.find(x=>x.id===l.pid);
         const r=document.createElement('div'); r.className='line';
         const th=document.createElement('div'); th.className='th'; if(i.img){const im=document.createElement('img'); im.src=i.img; im.alt=''; th.appendChild(im);} r.appendChild(th);
         const mid=document.createElement('div'); mid.style.minWidth='0';
         const nm=document.createElement('div'); nm.className='nm'; nm.textContent=i.name; mid.appendChild(nm);
         const mt=document.createElement('div'); mt.className='meta'; mt.textContent=i.meta; mid.appendChild(mt);
+        if (l.pid!=='request' && inStoreVariant(l.pid,l.size)){ const n=document.createElement('div'); n.className='meta instore'; n.textContent='On the shelf now: buy it at the front desk. Remove it to check out.'; mid.appendChild(n); }
         r.appendChild(mid);
         const rt=document.createElement('div'); rt.className='rt';
-        rt.innerHTML = l.pid==='request' ? '<div class="meta">Price TBC</div>' : '<div>'+money(i.member)+'</div>'+(tier()&&tier().off?'<div class="meta"><s>'+money(i.list)+'</s></div>':'');
+        if (l.pid==='request') rt.innerHTML='<div class="meta">Price to confirm</div>';
+        else { const off=payOff(p), list=p.price*l.qty, mem=offPrice(p.price,off)*l.qty; rt.innerHTML='<div>'+money(mem)+'</div>'+(off?'<div class="meta"><s>'+money(list)+'</s></div>':''); }
         const rm=document.createElement('button'); rm.type='button'; rm.className='rm'; rm.textContent='Remove';
         rm.onclick=()=>{ state.bag.splice(idx,1); store.set('bag',state.bag); renderBag(); draw(); };
         rt.appendChild(rm); r.appendChild(rt);
         lines.appendChild(r);
       });
-      drawTiers();
-      const t=totals();
-      if (!tier()) tot.innerHTML = '<div class="big">'+money(t.list)+'</div><div class="small">Regular price. Pick your membership below to see your savings.</div>';
-      else if (tier().off) tot.innerHTML = '<div class="savebig">You save '+money(t.save)+'</div><div class="big">'+money(t.member)+'</div><div class="small">'+tier().label+' price \u00b7 regular '+money(t.list)+'</div><div class="small">Plus Virginia sales tax at pickup</div>';
-      else tot.innerHTML = '<div class="big">'+money(t.list)+'</div><div class="small">Plus Virginia sales tax at pickup</div>';
+      drawAcct();
+      const t=totals(payTier(), true), hasPriced=priced().length;
+      tot.innerHTML = !hasPriced ? '<div class="small">Special requests aren’t charged now. We’ll confirm a price with you before we order.</div>'
+        : (t.save>0 ? '<div class="savebig">You save '+money(t.save)+'</div><div class="big">'+money(t.member)+'</div><div class="small">'+payTier().label+' price · regular '+money(t.list)+'</div>'
+               : '<div class="big">'+money(t.list)+'</div><div class="small">Regular price'+(payTier()&&payTier().cats?' (your Pickleball member savings apply to apparel, shoes and paddles)':'')+'</div>')
+          + '<div class="small">Virginia sales tax is added at checkout</div>';
+      send.hidden=false;
+      send.textContent = hasPriced ? 'Continue to payment' : 'Send my request';
+      fine.textContent = hasPriced
+        ? 'You’ll pay by card on the next screen. Orders close '+fmtDay(cut)+' at midnight and are placed Monday. Most arrive in 1 to 2 weeks, and we’ll let you know when your gear is at the front desk.'
+        : 'Orders close '+fmtDay(cut)+' at midnight. We’ll reach out about your request before we order it.';
     };
-    const tiersBox=document.createElement('div'); tiersBox.className='tiers';
-    const drawTiers=()=>{
-      tiersBox.innerHTML='<div class="q">Which membership do you have?</div>';
-      TIERS.forEach(tr=>{
-        const t=totals(tr.off);
-        const b=document.createElement('button'); b.type='button'; b.className='tieropt'; b.setAttribute('aria-pressed', String(state.tier===tr.id));
-        b.innerHTML='<span class="tl"></span><span class="tt"></span><span class="ts"></span>';
-        b.querySelector('.tl').textContent=tr.label+(tr.off?' \u00b7 '+Math.round(tr.off*100)+'% off':'');
-        b.querySelector('.tt').textContent=money(t.member);
-        b.querySelector('.ts').textContent=tr.off?('You save '+money(t.save)):'Regular price';
-        b.onclick=()=>{ setTier(tr.id); draw(); };
-        tiersBox.appendChild(b);
-      });
+    const drawAcct=()=>{
+      acct.innerHTML='';
+      if (state.auth){
+        const a=state.auth, d=document.createElement('div'); d.className='who';
+        d.innerHTML='<b></b><span></span>';
+        d.querySelector('b').textContent = a.tier_label ? a.tier_label+' prices applied' : 'Signed in';
+        d.querySelector('span').textContent = a.tier_label ? 'Signed in as '+a.email+(a.tier==='pickleball'?' \u00b7 20% off apparel, shoes and paddles':'') : 'No membership with shop savings found for '+a.email+', so regular prices apply.';
+        const o=document.createElement('button'); o.type='button'; o.className='link'; o.textContent='Not you? Sign out';
+        o.onclick=async()=>{ try{ await api('sign_out',{token:a.token}); }catch(e){} setAuth(null); em.readOnly=false; draw(); };
+        d.appendChild(o); acct.appendChild(d);
+      } else {
+        const q=document.createElement('div'); q.className='q'; q.textContent='Members, sign in for your price'; acct.appendChild(q);
+        const sub=document.createElement('p'); sub.className='small'; sub.style.margin='0 0 4px'; sub.textContent='Players save 20%, Founding members 30%, Pickleball members 20% on apparel, shoes and paddles. Not a member? Skip this and check out below at the regular price.'; acct.appendChild(sub);
+        acct.appendChild(signInBox(()=>{ em.value=state.auth.email; em.readOnly=true; if(!nm.value && state.auth.name) nm.value=state.auth.name; draw(); }));
+      }
     };
-    w.insertBefore(tiersBox, tot);
-    draw();
-
     const f=document.createElement('form'); f.className='form'; f.noValidate=true; w.appendChild(f);
     const field=(id,label,type,val,full,ac)=>{ const d=document.createElement('div'); d.className='field'+(full?' full':''); d.innerHTML='<label for="'+id+'">'+label+'</label>'; const i=document.createElement('input'); i.id=id; i.name=id; i.type=type; i.value=val||''; if(ac) i.autocomplete=ac; d.appendChild(i); f.appendChild(d); return i; };
-    const nm=field('f-name','Name','text',state.me.name,true,'name');
-    const em=field('f-email','Email','email',state.me.email,false,'email');
+    const nm=field('f-name','Name','text',state.me.name||(state.auth&&state.auth.name)||'',true,'name');
+    const em=field('f-email','Email','email',state.auth?state.auth.email:state.me.email,false,'email'); if(state.auth) em.readOnly=true;
     const ph=field('f-phone','Mobile','tel',state.me.phone,false,'tel');
     const nd=document.createElement('div'); nd.className='field full'; nd.innerHTML='<label for="f-notes">Anything we should know? (optional)</label>';
     const notes=document.createElement('textarea'); notes.id='f-notes'; notes.style.minHeight='64px'; nd.appendChild(notes); f.appendChild(nd);
-
-    const fine=document.createElement('p'); fine.className='fine';
-    fine.textContent='Nothing is charged now. Orders close '+fmtDay(cut)+' at midnight and are placed Monday. Most arrive in 1 to 2 weeks, and we’ll let you know when your gear is at the front desk, and you can pay in store or on the card you have on file.';
-    w.appendChild(fine);
+    const fine=document.createElement('p'); fine.className='fine'; w.appendChild(fine);
     const err=document.createElement('p'); err.className='err'; err.setAttribute('role','alert');
-    const send=document.createElement('button'); send.type='button'; send.className='btn'; send.textContent='Send my order';
+    const send=document.createElement('button'); send.type='button'; send.className='btn';
     w.append(send, err);
+    draw();
 
     send.onclick=async ()=>{
       err.textContent='';
       if(!state.bag.length){ err.textContent='Add something first.'; return; }
-      if(!tier()){ err.textContent='Pick your membership above.'; tiersBox.scrollIntoView({behavior:'smooth',block:'center'}); return; }
-      if(!nm.value.trim()){ err.textContent='Add your name so we can match it to your membership.'; nm.focus(); return; }
+      if(blocked().length){ err.textContent='Remove the items that are on the shelf now. Those are bought at the front desk.'; return; }
+      if(!nm.value.trim()){ err.textContent='Add your name.'; nm.focus(); return; }
       if(!/^\S+@\S+\.\S+$/.test(em.value.trim())){ err.textContent='Add an email we can reach you at.'; em.focus(); return; }
       if(ph.value.replace(/\D/g,'').length<10){ err.textContent='Add a mobile number so we can reach you when it arrives.'; ph.focus(); return; }
       state.me={name:nm.value.trim(), email:em.value.trim(), phone:ph.value.trim()}; store.set('me',state.me);
-      const t=totals();
-      const items = state.bag.map(l=>{ const i=lineInfo(l); return l.pid==='request' ? '• REQUEST ('+l.brand+' '+l.cat+'): '+l.text : '• '+l.qty+' × '+i.name+(i.meta?' — '+i.meta:'')+' — '+money(i.member)+(tier().off?' (regular '+money(i.list)+')':''); }).join('\n');
-      const json = JSON.stringify(state.bag.map(l=>{ const p=PRODUCTS.find(x=>x.id===l.pid); return {sku:l.pid, brand:p?p.brand:l.brand, product:p?p.name:'Request', color:l.color||null, size:l.size||null, qty:l.qty, list_each:p?p.price:null, member_each:p?memberPrice(p.price):null, request:l.text||null}; }));
-      const data = {'form-name':'member-order','bot-field':'',name:state.me.name,email:state.me.email,phone:state.me.phone,membership:tier().label,order_week:fmtDay(place),item_count:String(t.count),list_total:money(t.list),member_total:money(t.member),items,items_json:json,notes:notes.value.trim()};
-      send.disabled=true; send.textContent='Sending…';
+      const label=send.textContent; send.disabled=true; send.textContent='One moment…';
       try{
-        const r = await fetch('/', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(data).toString()});
-        if(!r.ok) throw new Error(r.status);
-        const first = state.me.name.split(' ')[0];
+        const j=await api('checkout',{ token: state.auth?state.auth.token:null, name:state.me.name, email:state.me.email, phone:state.me.phone, notes:notes.value.trim(),
+          lines: priced().map(l=>({pid:l.pid, color:l.color||null, size:l.size||null, qty:l.qty})),
+          requests: state.bag.filter(l=>l.pid==='request').map(l=>({brand:l.brand, cat:l.cat, text:l.text})) });
+        if (j.url){ location.href=j.url; return; }
         state.bag=[]; store.set('bag',state.bag); renderBag();
-        body.innerHTML='';
-        const d=document.createElement('div'); d.className='done';
-        d.innerHTML='<div class="label">Order received</div><h2></h2><p></p>';
-        d.querySelector('h2').textContent='Thanks, '+first+'.';
-        d.querySelector('p').textContent='Your order goes in on '+fmtDay(place)+'. We’ll let you know when it’s ready at the front desk.';
-        const b=document.createElement('button'); b.type='button'; b.className='btn'; b.style.marginTop='10px'; b.textContent='Keep browsing'; b.onclick=closeSheet; d.appendChild(b);
-        body.appendChild(d);
+        showDone(state.me.name.split(' ')[0], j.order_week, false);
       }catch(e){
-        send.disabled=false; send.textContent='Send my order';
-        err.textContent='That didn’t go through. Check your connection and try again, or show this screen at the front desk.';
+        send.disabled=false; send.textContent=label;
+        err.textContent=e.message||'That didn’t go through. Try again.';
       }
     };
   }, 'bag');
 }
+function showDone(first, week, paid){
+  openSheet(body=>{
+    const d=document.createElement('div'); d.className='done';
+    d.innerHTML='<div class="label"></div><h2></h2><p></p>';
+    d.querySelector('.label').textContent = paid ? 'Order paid' : 'Request received';
+    d.querySelector('h2').textContent='Thanks'+(first?', '+first:'')+'.';
+    d.querySelector('p').textContent = (week?'Your order goes in on '+week+'. ':'')+(paid?'We’ve emailed your receipt, and we’ll let you know when your gear is ready at the front desk.':'We’ll reach out about your request before we order it.');
+    const b=document.createElement('button'); b.type='button'; b.className='btn'; b.style.marginTop='10px'; b.textContent='Keep browsing'; b.onclick=closeSheet; d.appendChild(b);
+    body.appendChild(d);
+  }, 'done');
+}
+// Back from Stripe
+(()=>{
+  const q=new URLSearchParams(location.search), sid=q.get('paid');
+  if (q.get('checkout')==='canceled'){ history.replaceState(null,'',location.pathname); setTimeout(()=>openReview('Payment canceled. Your bag is still here.'),300); }
+  if (!sid) return;
+  history.replaceState(null,'',location.pathname);
+  state.bag=[]; store.set('bag',state.bag); renderBag();
+  api('confirm',{session_id:sid}).then(j=>showDone(j.first_name, j.order_week, j.paid)).catch(()=>showDone('', '', true));
+})();
 
 const matchesQ = p => { if (!state.q) return true; const hay=(p.brand+' '+p.name+' '+p.sub+' '+p.cat).toLowerCase(); return state.q.toLowerCase().split(/\s+/).filter(Boolean).every(w=>hay.includes(w)); };
 const priceOf = p => p.sale ? offPrice(p.price,p.sale) : p.price;
