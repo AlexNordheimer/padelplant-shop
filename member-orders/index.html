@@ -1159,8 +1159,8 @@ function renderBag(){
   const best=totals(FOUNDING);
   $('#bagTotal').textContent = best.save>0 ? 'Save up to '+money(best.save) : money(t.list);
 }
-$('#openBag').addEventListener('click',openReview);
-$('#bagBtn').addEventListener('click',openReview);
+$('#openBag').addEventListener('click',()=>openReview());
+$('#bagBtn').addEventListener('click',()=>openReview());
 $('#toTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 window.addEventListener('hashchange',()=>{ if(location.hash==='#feature' && !state.staffPick){ state.staffPick=true; renderAll(); renderStaffBar(); } });
 
