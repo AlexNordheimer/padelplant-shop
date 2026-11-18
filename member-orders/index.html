@@ -474,7 +474,7 @@ const WILSON_IMG = {
   'WR190811U':'WR190811U_0_OPTIX_V2_POWER_RED_Grey_Red_1_red_01.png',
   'WR190711U':'WR190711U_0_OPTIX_V2_LITE_WHITE_White_Beige_white_01.png',
   'WR213811U':'WR213811U_0_Blade_v4_JR_BrightGreen_green_01.png',
-  'WRS338740':'WRS338480_0_Rush_Pro_5_DejaVuBlue_White_Black_dejaVuBlueWhiteBlack_01.png',
+  'WRS338740':'WRS338740_0_Rush_Pro_5_Padel_White_White_White_whiteWhiteWhite_01.png', // white: the colorway in the shop
   'WRS340980':'WRS340980_0_Courtglide_Padel_Black_White_LunarRock_blackWhiteLunarRock_01.png',
   'WRS340970':'WRS340970_0_Courtglide_Padel_W_White_Bay_SkipperBlue_whiteBaySkipperBlue_01.png',
   'WR8913001':'WR8913001_0_Padel_Super_Tour_Red_Red_red_01.png',
@@ -581,7 +581,7 @@ function WILSON(){
     W('WR19070','Racquets','Optix V2 Lite','Optix series · light and easy',139,'optix-v2-lite-wr19070','WR190711U_/WR190711U__cb92fea6516d6188ed24bdd81f8ebf0d.png',['Lilac','White']),
     W('WR21380','Racquets','Blade Jr V4','Junior',149,'blade-jr-v4-padel-frm-wr21380','WR213811U_/WR213811U__7bfb2bea7fa0d646cbf7a756df0a4d42.png',['Green']),
     // Shoes (US sizes)
-    W('WRS00930','Shoes','Rush Pro 5',"Men's padel shoe",170,'rush-pro-5-padel-wrs00930','WRS338740_/WRS338740__a16539447f717e1f75a373587469611b.png',['Black / Infrared / White','Gray Dawn / Black / Tender Yellow','White / White / White','Snow White / Snow White / Safety Yellow'],MENS),
+    W('WRS00930','Shoes','Rush Pro 5',"Men's padel shoe",170,'rush-pro-5-padel-wrs00930','WRS338740_/WRS338740__a16539447f717e1f75a373587469611b.png',['White / White / White','Black / Infrared / White','Gray Dawn / Black / Tender Yellow','Snow White / Snow White / Safety Yellow'],MENS),
     W('WRS01019','Shoes','Courtglide',"Men's padel shoe",85,'courtglide-padel-wrs01019','WRS340980_/WRS340980__723f262e723e2998cc579faf60e5a2da.png',['Black / White / Lunar Rock','White / Bay / Fiery Coral','White / Navy Blazer / Quarry'],MENS),
     W('WRS01020','Shoes','Courtglide',"Women's padel shoe",85,'courtglide-padel-w-wrs01020','WRS340970_/WRS340970__2611d2c7798a91e93538a9736ebfd773.png',['White / Airy Blue / Navy Blazer','White / Bay / Skipper Blue','White / White / Silver'],WOMENS),
     // Bags & accessories
@@ -704,9 +704,9 @@ const CATS = ['Padel Plant merch','Racquets','Pickleball','Shoes','Apparel','Bag
    They show only under "In store" and are bought at the front desk. */
 const SHOP_ONLY = []; const shopOnlySeen = new Set();
 const SHOE_MODELS = [
-  {re:/^intrigue/i, name:'Intrigue Tour', sub:"Women's padel shoe", img:'WRS336940_/WRS336940__a0f6de9eea65eebeb983d1a15af67b22.png'},
+  {re:/^intrigue/i, name:'Intrigue Tour', sub:"Women's padel shoe", src:WILSON_CDN+'WRS338900_5_Intrigue_Tour_Padel_AiryBlue_White_AiryBlue_airyBlueWhiteAiryBlue_01.png?width=600'} // Airy Blue, the colorway in the shop,
   // Toast lists the same shoe as "Hurakn 2.0" and "Hurakn Pro V2": one card
-  {re:/^hurakn (pro v2|2\.0)/i, name:'Hurakn 2.0', sub:"Men's padel shoe", src:'https://cdn.shopify.com/s/files/1/0409/8706/6536/products/MENS-HURAKN-2-0-BLACK-WH-EBONY-WRS330500-3.jpg?width=600'}
+  {re:/^hurakn (pro v2|2\.0)/i, name:'Hurakn 2.0', sub:"Men's padel shoe", src:WILSON_CDN+'WRS338270_0_Hurakn_Pro_V2_Black_Infrared_ClearWhite_blackInfraredWhite_01.png?width=600'} // Black / Infrared, the colorway in the shop
 ];
 /* Toast Retail items we don't show online (not sold anymore, no photo yet, or not for the site) */
 const HIDE_FROM_SITE = [/^bela tour/i, /alien light/i, /^the plant shirt/i, /pickle ?balls?/i, /\bhat\b(?!.*here to serve)/i, /^here to serve(?!.*hat)/i, /crewneck|hoodie|beanie|green t-?shirt/i];
