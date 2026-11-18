@@ -539,7 +539,9 @@ PRODUCTS.forEach(p => { const m = SHOE_COLOR_IMG[p.id]; if (!m) return; p.colors
 })();
 /* Not orderable on Wilson B2B (checked Nov 2, 2026). Still shown under In store when Toast has them. */
 const NOT_ON_B2B = ['wl-wr21390','wl-wr19030','wl-wr19050','wl-wr19080','wl-wr19070','wl-breakpoint-tee','wl-classic-court-short','wl-warmup-jacket','wl-america-crew','wl-allday-halfzip','wl-everyday-brami'];
-PRODUCTS.forEach(p => { if (NOT_ON_B2B.includes(p.id)) p.shopOnly = true; });
+/* Hirostar apparel: in store only for now (not ordered online). Shown under In store when Toast has it. */
+const HIROSTAR_APPAREL_IN_STORE_ONLY = true;
+PRODUCTS.forEach(p => { if (NOT_ON_B2B.includes(p.id) || (HIROSTAR_APPAREL_IN_STORE_ONLY && p.brand === 'Hirostar' && p.cat === 'Apparel')) p.shopOnly = true; });
 /* Photos for in-store items whose Toast entry has no picture (Toast photos win when added). */
 const SHOP_ONLY_IMG = [
   [/^wilson defy v1/i, WILSON_CDN + 'WR173711U_0_DEFY_V1_PADEL_blackGold_01.png?width=600'],
