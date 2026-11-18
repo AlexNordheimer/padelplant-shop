@@ -404,18 +404,8 @@ i,em{font-style:normal}
 .hero p{max-width:52ch}
 @media (max-width:699px){.promos{flex-direction:column;flex-wrap:nowrap;overflow:visible;white-space:normal;gap:6px}.promos span{white-space:normal}}
 
-/* Padel touches on the shop: each product sits on a top-down padel court, section titles get a net line */
-.media{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%233a503c' stroke-width='.5' vector-effect='non-scaling-stroke' opacity='.16'%3E%3Crect x='6' y='28' width='88' height='44'/%3E%3Cline x1='50' y1='24' x2='50' y2='76'/%3E%3Cline x1='19.4' y1='28' x2='19.4' y2='72'/%3E%3Cline x1='80.6' y1='28' x2='80.6' y2='72'/%3E%3Cline x1='19.4' y1='50' x2='80.6' y2='50'/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat}
-.media img.photo{background:#fff}
-.media img:not(.photo){mix-blend-mode:multiply}
+/* hover: outline the tile in green */
 .card:hover .media,.fcard:hover .media{box-shadow:inset 0 0 0 1px var(--green)}
-.sec-head{position:relative;padding-bottom:14px;margin-bottom:22px}
-.sec-head::after{content:"";position:absolute;left:0;right:0;bottom:0;height:9px;
-  background:linear-gradient(var(--green),var(--green)) left 4px/100% 1px no-repeat,
-             linear-gradient(var(--green),var(--green)) left 0/3px 9px no-repeat,
-             linear-gradient(var(--green),var(--green)) right 0/3px 9px no-repeat}
-.card .brand,.fcard .brand{display:flex;align-items:center;gap:6px}
-.stock::before{border-radius:50%;width:7px;height:7px;background:none;box-shadow:inset 0 0 0 1.5px var(--green)}
 /* how it works */
 .how{margin-top:88px;padding-top:40px;border-top:1px solid var(--faint)}
 .how li{font-size:var(--fs-s);color:var(--green)}
