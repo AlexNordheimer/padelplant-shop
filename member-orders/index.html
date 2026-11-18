@@ -1164,7 +1164,7 @@ $('#bagBtn').addEventListener('click',openReview);
 $('#toTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 window.addEventListener('hashchange',()=>{ if(location.hash==='#feature' && !state.staffPick){ state.staffPick=true; renderAll(); renderStaffBar(); } });
 
-/* ---------- member sign-in (email code) and checkout (Stripe) ----------
+/* ---------- member sign-in (email or mobile, matched to Playbypoint) and checkout (Stripe) ----------
    Backend: Supabase function "shop" (or "shop-test" after visiting ?shoptest=1). It checks the
    member's Playbypoint membership for the discount and recomputes every price itself. */
 // Previews (anything that isn't shop.padelplant.com) always use Stripe test mode.
@@ -1190,35 +1190,28 @@ function renderAuth(){
   b.textContent = a ? ((a.name||'').split(' ')[0] || 'My account') + (a.tier_label ? ' · '+a.tier_label.replace(/ member$/,'') : '') : 'Member sign in';
 }
 function signInBox(onDone){
+  // Members sign in with the email or mobile on their Playbypoint account. No code; they stay signed in on this device.
   const box=document.createElement('div'); box.className='signin';
-  let email = (state.me && state.me.email) || '';
-  const step1=()=>{
-    box.innerHTML='<label for="si-email">Email on your Padel Plant account</label><div class="row"><input id="si-email" type="email" autocomplete="email"><button type="button" class="btn">Send code</button></div><p class="err" role="alert"></p>';
-    const i=box.querySelector('input'), b=box.querySelector('button'), e=box.querySelector('.err'); i.value=email;
-    const go=async()=>{ email=i.value.trim(); e.textContent=''; if(!/^\S+@\S+\.\S+$/.test(email)){ e.textContent='Enter your email.'; i.focus(); return; }
-      b.disabled=true; b.textContent='Sending…';
-      try{ await api('send_code',{email}); step2(); }catch(x){ e.textContent=x.message; b.disabled=false; b.textContent='Send code'; } };
-    b.onclick=go; i.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); go(); } };
-  };
-  const step2=()=>{
-    box.innerHTML='<label for="si-code"></label><div class="row"><input id="si-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"><button type="button" class="btn">Sign in</button></div><p class="err" role="alert"></p><button type="button" class="link again">Use a different email</button>';
-    box.querySelector('label').textContent='Enter the 6-digit code we sent to '+email;
-    const i=box.querySelector('input'), b=box.querySelector('.btn'), e=box.querySelector('.err');
-    box.querySelector('.again').onclick=step1;
-    const go=async()=>{ e.textContent=''; b.disabled=true; b.textContent='Checking…';
-      try{ const a=await api('verify_code',{email, code:i.value}); setAuth({token:a.token, email:a.email, name:a.name, tier:a.tier, tier_label:a.tier_label}); onDone && onDone(); }
-      catch(x){ e.textContent=x.message; b.disabled=false; b.textContent='Sign in'; } };
-    b.onclick=go; i.oninput=()=>{ if(i.value.replace(/\D/g,'').length===6) go(); };
-    setTimeout(()=>i.focus(),50);
-  };
-  step1();
+  box.innerHTML='<label for="si-email">Email on your Padel Plant account</label><input id="si-email" type="email" autocomplete="email">'
+    +'<label for="si-phone">Mobile <span style="font-weight:400;color:var(--soft)">(if your email doesn’t match)</span></label><div class="row"><input id="si-phone" type="tel" autocomplete="tel" inputmode="tel"><button type="button" class="btn">Sign in</button></div><p class="err" role="alert"></p>';
+  const em=box.querySelector('#si-email'), ph=box.querySelector('#si-phone'), b=box.querySelector('button'), e=box.querySelector('.err');
+  em.value=(state.me && state.me.email) || ''; ph.value=(state.me && state.me.phone) || '';
+  const go=async()=>{ const email=em.value.trim(); e.textContent='';
+    if(!/^\S+@\S+\.\S+$/.test(email)){ e.textContent='Enter your email.'; em.focus(); return; }
+    b.disabled=true; b.textContent='Checking…';
+    try{
+      const a=await api('match',{email, phone:ph.value});
+      if(!a.matched){ e.textContent='We couldn’t find a membership for that email or mobile. Use the ones on your Playbypoint account, or check out at the regular price.'; b.disabled=false; b.textContent='Sign in'; return; }
+      setAuth({token:a.token, email:a.email, name:a.name, tier:a.tier, tier_label:a.tier_label}); onDone && onDone();
+    }catch(x){ e.textContent=x.message; b.disabled=false; b.textContent='Sign in'; } };
+  b.onclick=go; [em,ph].forEach(i=>i.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); go(); } });
   return box;
 }
 function openAccount(){
   openSheet(body=>{
     const w=document.createElement('div'); w.className='review'; body.appendChild(w);
     if (!state.auth){
-      w.innerHTML='<div class="label" style="color:var(--soft)">Members</div><h2>Sign in</h2><p class="fine" style="margin-top:6px">We’ll email you a code. Your member price is applied automatically, and you stay signed in on this device.</p>';
+      w.innerHTML='<div class="label" style="color:var(--soft)">Members</div><h2>Sign in</h2><p class="fine" style="margin-top:6px">Use the email or mobile on your Padel Plant account. Your member price is applied automatically, and you stay signed in on this device.</p>';
       w.appendChild(signInBox(()=>{ closeSheet(); renderAll(); renderBag(); }));
       return;
     }
