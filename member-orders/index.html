@@ -352,7 +352,7 @@ footer a{text-underline-offset:3px}
       <div class="facts" aria-label="Member savings">
         <button type="button" data-tier="players"><b>20% off</b><span>Players members</span></button>
         <button type="button" data-tier="founding"><b>30% off</b><span>Founding members</span></button>
-        <div class="wide"><b class="cutoff" id="cutoff"></b>We place orders every Monday. Pick up and pay at the front desk, nothing is charged online.</div>
+        <div class="wide"><b class="cutoff" id="cutoff"></b>Pay online, we place orders every Monday, and you pick up at the front desk.</div>
       </div>
     </div>
   </section>
@@ -384,9 +384,9 @@ footer a{text-underline-offset:3px}
     <h2>How ordering <i>works</i></h2>
     <ol>
       <li><b>Browse</b><span>Everything marked In store is on our shelves now. Switch to Order online for the full Hirostar, Wilson and Nox range.</span></li>
-      <li><b>Send your order</b><span>by Sunday at midnight. Nothing is charged online.</span></li>
+      <li><b>Order and pay</b><span>online by Sunday at midnight. Members sign in for their price.</span></li>
       <li><b>We order Monday</b><span>Most orders arrive in 1 to 2 weeks. We text you when it's at the front desk.</span></li>
-      <li><b>Pick up and pay</b><span>in store. Your member price is applied at the desk.</span></li>
+      <li><b>Pick up</b><span>at the front desk. Anything on our shelves you can buy there any time.</span></li>
     </ol>
   </section>
 
@@ -452,6 +452,26 @@ const PRODUCTS = [
   {id:'nx-at10-genius-18k', brand:'Nox', cat:'Racquets', name:'AT10 Genius 18K 2026', sub:'Agust\u00edn Tapia signature', price:455, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-18k-alum-2026-by-agustin-tapia-pat10genius1826-8435778902621-2175122.png?v=1769512354', url:'https://noxsportusa.com/products/at10-genius-18k-tapia-2026-racket', tag:'New'},
   {id:'nx-ea10-ventus-attack', brand:'Nox', cat:'Racquets', name:'EA10 Ventus Attack 12K 2026', sub:'Edu Alonso signature \u00b7 power', price:400, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/ea10-ventus-attack-12k-xtrem-by-edu-alonso-pea10ventusa1226-8435778902683-7841159.png?v=1769512358', url:'https://noxsportusa.com/products/ea10-ventus-attack-12k-2026-racket', tag:'New'},
   {id:'nx-ventus-hybrid-lite', brand:'Nox', cat:'Racquets', name:'Ventus Hybrid 12K Lite 2026', sub:'Lighter, all-round', price:350, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/ventus-hybrid-12k-lite-pventus12hl-8435778902713-2355266.png?v=1769512358', url:'https://noxsportusa.com/products/ventus-12k-hybrid-lite-2026-racket', tag:'New'},
+  /* Rest of the Nox racquet range (noxsportusa.com, full list price; checked Nov 18, 2026). Ordered online. */
+  {id:'nx-genius-18k-27', brand:'Nox', cat:'Racquets', name:'Genius 18K Alum 2027', sub:'Agust\u00edn Tapia signature', price:450, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAGENIUS1827_1_eaf48a8c-d151-44e4-aa1f-c061d8802df2.png?v=1790268653', url:'https://noxsportusa.com/products/genius-18k-2027-by-agustin-tapia', tag:'New'},
+  {id:'nx-genius-12k-27', brand:'Nox', cat:'Racquets', name:'Genius 12K Alum XTREM 2027', sub:'Agust\u00edn Tapia signature', price:450, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAGENIUS1227_1.png?v=1790270539', url:'https://noxsportusa.com/products/genius-12k-alum-xtrem-2027-by-agustin-tapia', tag:'New'},
+  {id:'nx-genius-12k-lite-27', brand:'Nox', cat:'Racquets', name:'Genius 12K XTREM Lite 2027', sub:'Agust\u00edn Tapia signature \u00b7 lighter', price:415, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAGENIUS12LI27_1.png?v=1790345518', url:'https://noxsportusa.com/products/genius-12k-alum-xtrem-lite-2027-by-agustin-tapia', tag:'New'},
+  {id:'nx-genius-attack-18k-27', brand:'Nox', cat:'Racquets', name:'Genius Attack 18K Alum 2027', sub:'Agust\u00edn Tapia signature \u00b7 power', price:450, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAGENIUSAT1827_1.png?v=1790269319', url:'https://noxsportusa.com/products/genius-attack-18k-alum-2027-by-agustin-tapia', tag:'New'},
+  {id:'nx-genius-attack-12k-27', brand:'Nox', cat:'Racquets', name:'Genius Attack 12K XTREM 2027', sub:'Agust\u00edn Tapia signature \u00b7 power', price:450, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAGENIUSAT1227_1.png?v=1790275690', url:'https://noxsportusa.com/products/genius-attack-12k-alum-xtrem-2027-by-agustin-tapia', tag:'New'},
+  {id:'nx-ventus-3k-27', brand:'Nox', cat:'Racquets', name:'Ventus Control 3K 2027', sub:'Miguel Lamperti signature \u00b7 control', price:415, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAVENTUS327_1.png?v=1790372647', url:'https://noxsportusa.com/products/ventus-control-3k-2027-by-miguel-lamperti', tag:'New'},
+  {id:'nx-procup-hard-27', brand:'Nox', cat:'Racquets', name:'Pro Cup HARD 2027', sub:'Agust\u00edn Tapia \u00b7 firm feel', price:250, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAPCHARD27_1.png?v=1790374025', url:'https://noxsportusa.com/products/pro-cup-hard-2027-by-agustin-tapia'},
+  {id:'nx-procup-soft-27', brand:'Nox', cat:'Racquets', name:'Pro Cup SOFT 2027', sub:'Agust\u00edn Tapia \u00b7 soft feel', price:250, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAPCSOFT27_1.png?v=1790374318', url:'https://noxsportusa.com/products/pro-cup-soft-2027-by-agustin-tapia'},
+  {id:'nx-at10-genius-12k', brand:'Nox', cat:'Racquets', name:'AT10 Genius 12K 2026', sub:'Agust\u00edn Tapia signature', price:455, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-12k-alum-xtrem-2026-by-agustin-tapia-pat10genius1226-8435778902645-9466941.png?v=1769512354', url:'https://noxsportusa.com/products/at10-genius-12k-tapia-2026-racket'},
+  {id:'nx-at10-genius-12k-lite', brand:'Nox', cat:'Racquets', name:'AT10 Genius 12K Lite 2026', sub:'Agust\u00edn Tapia signature \u00b7 lighter', price:400, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-12k-alum-xtrem-lite-2026-by-agustin-tapia-pat10genius12li26-8435778902652-8162701.png?v=1769512354', url:'https://noxsportusa.com/products/at10-genius-12k-tapia-lite-2026-racket'},
+  {id:'nx-at10-attack-18k', brand:'Nox', cat:'Racquets', name:'AT10 Genius Attack 18K 2026', sub:'Agust\u00edn Tapia signature \u00b7 power', price:420, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-attack-18k-alum-2026-by-agustin-tapia-pat10geniusat1826-8435778902638-4015240.png?v=1769512354', url:'https://noxsportusa.com/products/at10-genius-attack-18k-tapia-2026-racket'},
+  {id:'nx-at10-attack-12k', brand:'Nox', cat:'Racquets', name:'AT10 Genius Attack 12K 2026', sub:'Agust\u00edn Tapia signature \u00b7 power', price:420, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-attack-12k-alum-xtrem-2026-by-agustin-tapia-pat10geniusat1226-8435778902669-3810595.png?v=1769512360', url:'https://noxsportusa.com/products/at10-genius-attack-12k-tapia-2026-racket'},
+  {id:'nx-ea10-ventus-hybrid', brand:'Nox', cat:'Racquets', name:'EA10 Ventus Hybrid 12K 2026', sub:'Edu Alonso signature \u00b7 all-round', price:400, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/ea10-ventus-hybrid-12k-xtrem-by-edu-alonso-pea10ventush1226-8435778902676-9207640.png?v=1769512358', url:'https://noxsportusa.com/products/ea10-ventus-hybrid-12k-2026-racket'},
+  {id:'nx-ml10-ventus-3k', brand:'Nox', cat:'Racquets', name:'ML10 Ventus Control 3K 2026', sub:'Miguel Lamperti signature \u00b7 control', price:400, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/ml10-ventus-control-3k-by-miguel-lamperti-pml10ventus326-8435778902690-1107820.png?v=1769512360', url:'https://noxsportusa.com/products/ml10-ventus-3k-2026-racket'},
+  {id:'nx-vk10-ventus-12k', brand:'Nox', cat:'Racquets', name:'VK10 Ventus Control 12K 2026', sub:'Aranzazu Osoro signature \u00b7 control', price:350, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/vk10-ventus-control-12k-by-aranzazu-osoro-pvk10ventus1226-8435778902706-3301494.png?v=1769512358', url:'https://noxsportusa.com/products/vk10-ventus-12k-2026-racket'},
+  {id:'nx-equation-hard-26', brand:'Nox', cat:'Racquets', name:'Equation HARD Advanced 2026', sub:'Intermediate \u00b7 firm feel', price:175, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/equation-hard-advanced-pequhadv26-8435778902744-7143230.png?v=1769512362', url:'https://noxsportusa.com/products/equation-hard-2026-racket'},
+  {id:'nx-x-one-silhouette', brand:'Nox', cat:'Racquets', name:'X-ONE Silhouette', sub:'Beginner friendly', price:125, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/x-one-silhouette-palas-psilhouet26nox-5788101.webp?v=1794452214', url:'https://noxsportusa.com/products/x-one-silhoutte'},
+  {id:'nx-x-hero-blue', brand:'Nox', cat:'Racquets', name:'X-Hero Blue', sub:'Beginner friendly', price:110, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/x-hero-blue-pxherobl-8435778902782-7907333.png?v=1769512362', url:'https://noxsportusa.com/products/x-hero-blue-racket'},
+  {id:'nx-genius-junior', brand:'Nox', cat:'Racquets', name:'Genius Junior', sub:'Junior racquet \u00b7 Agust\u00edn Tapia', price:115, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-genius-jr-by-agustin-tapia-palas-pat10jr26nox-4618138.webp?v=1794451459', url:'https://noxsportusa.com/products/genius-junior-by-agustin-tapia'},
   {id:'nx-xfoam-jma', brand:'Nox', cat:'Pickleball', name:'X-FOAM JMA 16mm', sub:'Pickleball paddle', price:249.95, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/pala-pickleball-x-foam-jma-16mm-palas-pickleball-ppixfojma26nox-8910291.png?v=1769512320', url:'https://noxsportusa.com/products/2026-pickleball-paddle-x-foam-jma-16mm', tag:'New'},
 
   // ---------- Wilson (US prices from wilson.com, Oct 2026) ----------
@@ -625,7 +645,9 @@ const atClub = p => Object.prototype.hasOwnProperty.call(AT_CLUB, p.id);
 /* What's on the shelf, per online product: list of sizes in store ([] = the item itself, no sizes).
    Anything on the shelf is bought at the front desk, not online. */
 const IN_STORE = {};
-const inStoreVariant = (pid,size) => { const s=IN_STORE[pid]; if(!s) return false; return !s.length || (!!size && s.includes(size)); };
+/* Stocked items are bought at the desk, except racquets: those can also be ordered online (we bring in a new one). */
+const ORDER_STOCKED_ONLINE = ['Racquets'];
+const inStoreVariant = (pid,size) => { const s=IN_STORE[pid]; if(!s) return false; const pp=PRODUCTS.find(x=>x.id===pid); if(pp && ORDER_STOCKED_ONLINE.includes(pp.cat)) return false; return !s.length || (!!size && s.includes(size)); };
 
 /* Live stock from Toast (served by the Netlify function at /api/stock).
    TOAST_LINK pins a Toast item name to a product id when the automatic match can't tell them apart. */
@@ -1066,7 +1088,7 @@ function openProduct(p){
     const br=document.createElement('div'); br.className='label'; br.style.color='var(--soft)'; br.textContent=p.brand+' · '+p.cat; right.appendChild(br);
     const h=document.createElement('h2'); h.textContent=p.name; right.appendChild(h);
     const s=document.createElement('p'); s.className='desc'; s.textContent=p.sub+(p.colorNote?' \u00b7 '+p.colorNote:''); right.appendChild(s);
-    if (atClub(p)){ const n=document.createElement('p'); n.className='clubnote'; n.style.margin='-4px 0 16px'; n.innerHTML='<b></b><span></span>'; n.querySelector('b').textContent=(AT_CLUB[p.id]||'In stock in store'); n.querySelector('span').textContent=p.shopOnly?'Come by the front desk to try it and buy it. Member prices apply.':((IN_STORE[p.id]||[]).length?' Sizes on the shelf are bought at the front desk. Order any other size below.':' It\u2019s on the shelf, so buy it at the front desk. Member prices apply.'); right.appendChild(n); }
+    if (atClub(p)){ const n=document.createElement('p'); n.className='clubnote'; n.style.margin='-4px 0 16px'; n.innerHTML='<b></b><span></span>'; n.querySelector('b').textContent=(AT_CLUB[p.id]||'In stock in store'); n.querySelector('span').textContent=p.shopOnly?'Come by the front desk to try it and buy it. Member prices apply.':(ORDER_STOCKED_ONLINE.includes(p.cat)?' Grab it at the front desk today, or order it below and we\u2019ll bring in a new one.':(IN_STORE[p.id]||[]).length?' Sizes on the shelf are bought at the front desk. Order any other size below.':' It\u2019s on the shelf, so buy it at the front desk. Member prices apply.'); right.appendChild(n); }
     const pb=priceBlock(p,true); pb.style.marginBottom='20px'; right.appendChild(pb);
     if (p.shopOnly) return;
 

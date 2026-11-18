@@ -47,7 +47,8 @@ export default async (req) => {
         brand: p.brand, name: p.name, sub: p.sub || '', cat: p.cat || '', price: p.price,
         sizes: p.sizes || null, colors: p.colors ? Object.keys(p.colors) : null,
         img: p.colors ? Object.values(p.colors)[0] : (p.img || ''),
-        in_store: inStore[p.id] ? { sizes: inStore[p.id].sizes } : null,
+        // racquets can be ordered online even when one is on the shelf (we bring in a new one)
+        in_store: inStore[p.id] && p.cat !== 'Racquets' ? { sizes: inStore[p.id].sizes } : null,
       };
     }
     const tiers = Object.fromEntries(TIERS.filter(t => t.off).map(t => [t.id, { label: t.label, off: t.off, cats: t.cats || null }]));
