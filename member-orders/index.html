@@ -6,7 +6,7 @@
 <title>The Pro Shop · Padel Plant</title>
 <link rel="icon" type="image/png" href="https://cdn.prod.website-files.com/66bf86002aa4b96f4221ea70/679d9c41feedccbd26eaf752_Black%20n%20White%20Favicon.png">
 <link rel="apple-touch-icon" href="https://cdn.prod.website-files.com/66bf86002aa4b96f4221ea70/679d9cd76526580422db677c_256%20x%20256.png">
-<meta name="description" content="Order Hirostar and Wilson gear through Padel Plant. One order goes in every Monday. Pay at pickup.">
+<meta name="description" content="The Padel Plant pro shop. Shop what's on our shelves, or order Hirostar, Wilson and Nox gear online. Members save.">
 <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/hansen-grotesque">
 <link rel="stylesheet" href="https://use.typekit.net/ifc2gan.css">
 <style>
@@ -309,6 +309,66 @@ footer .caslon{font-size:22px}
 footer a{text-underline-offset:3px}
 .wrap{padding-bottom:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---------- Clean pass (Nov 2026): one typeface, three sizes, no italics, square corners, fewer labels ---------- */
+:root{--r:6px;--fs-s:13px;--fs-m:15px;--fs-l:20px}
+body,button,input,select,textarea{font-family:var(--HG)}
+i,em{font-style:normal}
+.label,.tabs button,.seg button,.tb-count,.sec-head .count,.card .brand,.fcard .brand,.chip,.prices .who,.clubnote b,.facts span,.facts .wide b,.pill,.media .tag,.how li::before{letter-spacing:0!important;text-transform:none!important}
+/* hero: one headline, one line of text, two plain buttons */
+.hero{padding-top:28px;padding-bottom:30px}
+.hero .label{font-size:var(--fs-s);font-weight:500;opacity:.8}
+.hero h1{font-family:var(--CA);font-style:normal;font-size:clamp(34px,4vw,48px);margin:8px 0 10px}
+.hero h1 i{font-style:normal}
+.hero p{font-size:var(--fs-m)}
+.pill,.pill.line{border-radius:var(--r);font-size:var(--fs-s);font-weight:600;padding:11px 18px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 24px;background:none;border:0;border-radius:0;align-self:end}
+.facts > div,.facts > button{background:none;padding:0}
+.facts button{display:flex;align-items:baseline;gap:6px;opacity:.75}
+.facts button[aria-pressed="true"]{background:none;color:inherit;opacity:1;text-decoration:underline;text-underline-offset:4px}
+.facts button[aria-pressed="true"] span::after{content:""}
+.facts b{font-family:var(--HG);font-style:normal;font-weight:600;font-size:var(--fs-m);display:inline}
+.facts span{font-size:var(--fs-m);font-weight:400;opacity:1;margin:0;display:inline}
+.facts .wide{flex-basis:100%;font-size:var(--fs-s);opacity:.8}
+.facts .wide b{font-size:var(--fs-s);font-weight:600;display:inline;margin:0 6px 0 0}
+/* promo strip: plain text */
+.promos{font-size:var(--fs-s)}
+.promos b{font-family:var(--HG);font-style:normal;font-weight:600;font-size:var(--fs-s)}
+/* section heads */
+.sec-head h2,.how h2{font-family:var(--HG);font-style:normal;font-weight:600;font-size:var(--fs-l);line-height:1.2}
+.sec-head .count,.tb-count{font-size:var(--fs-s);font-weight:400}
+/* toolbar */
+.tabs button{font-size:var(--fs-s);font-weight:500}
+.tabs button[aria-pressed="true"]{font-weight:600}
+.seg{border-radius:var(--r);padding:2px}
+.seg button{border-radius:4px;font-size:var(--fs-s);font-weight:500;padding:6px 12px}
+.sel,.searchrow input{border-radius:var(--r);font-size:var(--fs-s)}
+.searchrow input{font-size:var(--fs-m)}
+.where-note{font-size:var(--fs-s)}
+/* cards: photo, brand + name, price, one status line. No corner badge for "In store" (the status line says it) */
+.media{border-radius:10px}
+.media .tag{border-radius:4px;font-size:11px;font-weight:600;padding:3px 7px}
+.media .tag.club{display:none}
+.media.ph span:not(.tag){font-family:var(--HG);font-style:normal;font-size:var(--fs-m)}
+.card .brand,.fcard .brand{font-size:12px;font-weight:500}
+.card h3,.fcard h3{font-size:var(--fs-m);font-weight:600}
+.card .sub,.fcard .sub{font-size:var(--fs-s)}
+.stock{font-size:12px;color:var(--soft)}
+.stock::before{width:5px;height:5px}
+/* product sheet + bag */
+.chip{border-radius:var(--r);font-size:var(--fs-s);font-weight:500}
+.prices .reg .amt{font-family:var(--HG);font-weight:600;font-size:var(--fs-l)}
+.prices.big .reg .amt{font-size:24px}
+.prices .mrow{border-radius:var(--r)}
+.prices .who{font-size:var(--fs-s);font-weight:600}
+.prices .sv{border-radius:4px}
+.clubnote b{font-size:var(--fs-s);font-weight:600}
+.tiers .q{font-family:var(--HG);font-style:normal;font-weight:600;font-size:var(--fs-l)}
+.savebig{font-family:var(--HG);font-style:normal;font-weight:600;font-size:24px}
+.btn,.signin .btn,.signin input{border-radius:var(--r)}
+/* how it works: plain numbered list */
+.how li{font-size:var(--fs-s)}
+.how li::before{font-family:var(--HG);font-style:normal;font-weight:600;font-size:var(--fs-m)}
 </style>
 </head>
 <body>
@@ -341,8 +401,8 @@ footer a{text-underline-offset:3px}
   <section class="hero">
     <div class="in">
       <div>
-        <div class="label">The pro shop &middot; Casa Hirostar</div>
-        <h1>Gear up at <i>the Plant.</i></h1>
+        <div class="label">Padel Plant Pro Shop</div>
+        <h1>Gear up at the Plant.</h1>
         <p>Shop what's on our shelves, or order the full Hirostar, Wilson and Nox range and we'll bring it in. Members always save.</p>
         <div class="ctas">
           <a class="pill solid" href="#shopAll" data-where="shop">Shop in store</a>
@@ -381,7 +441,7 @@ footer a{text-underline-offset:3px}
   <main id="catalog"></main>
 
   <section class="how" aria-label="How ordering works">
-    <h2>How ordering <i>works</i></h2>
+    <h2>How ordering works</h2>
     <ol>
       <li><b>Browse</b><span>Everything marked In store is on our shelves now. Switch to Order online for the full Hirostar, Wilson and Nox range.</span></li>
       <li><b>Order and pay</b><span>online by Sunday at midnight. Members sign in for their price.</span></li>
