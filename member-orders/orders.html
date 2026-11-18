@@ -89,6 +89,7 @@ h2{font-family:var(--CA);font-style:italic;font-weight:400;font-size:28px;margin
   .ps .list td{padding:7px 6px 7px 0}
 }
 @media (max-width:560px){.row{grid-template-columns:40px minmax(0,1fr)}.right{grid-column:2;justify-items:start;text-align:left}}
+.paidbox{border:2px solid #3a503c;padding:8px 12px;font-weight:700;letter-spacing:.04em;margin:8px 0 10px}
 </style>
 </head>
 <body>
@@ -148,7 +149,7 @@ async function load(){
   try{
     setMsg('Loading orders…');
     const j=await api('/api/orders');
-    orders=j.orders||[];
+    orders=(j.orders||[]).filter(o=>!o.test || /[?&]showtest/.test(location.search)); // test checkouts only with ?showtest
     $('#gate').hidden=true; $('#app').hidden=false; setMsg('');
     const weeks=[...new Set(orders.map(o=>o.week))];
     weeks.sort((a,b)=>weekDate(b)-weekDate(a));
@@ -228,7 +229,7 @@ function render(weeks){
     const m=el('div','member');
     const top=el('div','top');
     const left=el('div'); left.append(el('div','nm',o.name), el('div','contact',o.phone+' · '+o.email));
-    const tot=el('div','right'); tot.append(el('div','prod',o.member_total), el('div','meta',o.membership+' · regular '+o.list_total));
+    const tot=el('div','right'); tot.append(el('div','prod',o.paid?o.payment:o.member_total), el('div','meta',o.membership+' · regular '+o.list_total));
     top.append(left,tot); m.appendChild(top);
     if(o.spam) m.appendChild(el('div','prod','Netlify flagged this order as spam. Check it\u2019s real before ordering.'));
     if(o.notes) m.appendChild(el('div','meta','Note: '+o.notes));
@@ -275,9 +276,9 @@ function printSheets(){
   // cover: one line per member
   h+='<section class="ps"><div class="hd"><span class="label">Padel Plant · Pro shop pickups</span><span class="label">Printed '+esc(today)+'</span></div>';
   h+='<h3>Pickup checklist</h3><div class="who">'+list.length+' member'+(list.length>1?'s':'')+' with gear waiting at the desk. Each member has their own page after this one.</div>';
-  h+='<table class="list"><tr><th></th><th>Member</th><th>Phone</th><th>Membership</th><th class="n">Items</th><th class="n">To charge</th></tr>';
+  h+='<table class="list"><tr><th></th><th>Member</th><th>Phone</th><th>Membership</th><th class="n">Items</th><th class="n">Payment</th></tr>';
   list.forEach(o=>{ const n=o.items.reduce((m,i)=>m+(i.qty||1),0); const t=o.items.reduce((m,i)=>m+(i.member_each||0)*(i.qty||1),0);
-    h+='<tr><td><span class="box"></span></td><td><b>'+esc(o.name)+'</b></td><td>'+esc(o.phone)+'</td><td>'+esc(o.membership)+'</td><td class="n">'+n+'</td><td class="n">'+money(t)+(o.items.some(i=>i.request)?' + request':'')+'</td></tr>'; });
+    h+='<tr><td><span class="box"></span></td><td><b>'+esc(o.name)+'</b></td><td>'+esc(o.phone)+'</td><td>'+esc(o.membership)+'</td><td class="n">'+n+'</td><td class="n">'+(o.paid?'<b>PAID</b>':money(t)+' to charge')+(o.items.some(i=>i.request)?' + request':'')+'</td></tr>'; });
   h+='</table></section>';
   // one page per member
   list.forEach(o=>{
@@ -285,16 +286,18 @@ function printSheets(){
     h+='<section class="ps"><div class="hd"><span class="label">Padel Plant · Pro shop pickup</span><span class="label">Order of '+esc(o.week||'')+'</span></div>';
     h+='<h3>'+esc(o.name)+'</h3><div class="who"><b>'+esc(o.membership||'Membership not given')+'</b> · '+esc(o.phone)+' · '+esc(o.email)+'</div>';
     if(o.notes) h+='<div class="who sub">Note from member: '+esc(o.notes)+'</div>';
-    h+='<table><tr><th>Done</th><th>Item</th><th class="n">Qty</th><th class="n">Regular</th><th class="n">Charge</th><th>Ring up in Toast as</th></tr>';
+    if(o.paid) h+='<div class="paidbox">PAID ONLINE · '+esc(o.payment.replace(/^Paid online\s*/i,''))+'. Nothing to charge, just hand it over.</div>';
+    h+='<table><tr><th>Done</th><th>Item</th><th class="n">Qty</th><th class="n">Regular</th><th class="n">'+(o.paid?'Paid':'Charge')+'</th>'+(o.paid?'':'<th>Ring up in Toast as</th>')+'</tr>';
     o.items.forEach(it=>{
       const q=it.qty||1;
       h+='<tr><td><span class="box"></span></td><td><b>'+esc(itemLabel(it))+'</b>'+(itemMeta(it)?'<div class="sub">'+esc(itemMeta(it))+'</div>':'')+'<div class="sub">Status: '+esc(it.status)+'</div></td>';
       h+='<td class="n">'+q+'</td><td class="n">'+(it.list_each?money(it.list_each*q):'—')+'</td><td class="n"><b>'+(it.member_each?money(it.member_each*q):'Price TBC')+'</b></td>';
-      h+='<td>Special Order – '+esc(it.brand||'Other')+'</td></tr>';
+      h+=(o.paid?'':'<td>Special Order – '+esc(it.brand||'Other')+'</td>')+'</tr>';
     });
-    h+='</table><div class="tot"><span>Regular '+money(reg)+'</span><span>Member price <b>'+money(mem)+'</b></span></div><div class="tot sub">Plus Virginia sales tax</div>';
-    h+='<div class="how"><b>How to ring it up:</b> in Toast, open Retail and add <b>Special Order – [brand]</b> for each item. Type the amount from the Charge column (it already includes their member discount). If the member has already left, create the item on the <b>Merchandise</b> tab in Playbypoint at the same amount and charge it to their account (card on file). Tick Done, then mark the item Picked up on the order sheet.</div>';
-    h+='<div class="sign"><div>Rung up by</div><div>Date</div><div>Paid in: Toast / Playbypoint</div></div></section>';
+    h+='</table><div class="tot"><span>Regular '+money(reg)+'</span><span>Member price <b>'+money(mem)+'</b></span></div><div class="tot sub">'+(o.paid?'Paid online with tax':'Plus Virginia sales tax')+'</div>';
+    if(o.paid) h+='<div class="how"><b>Already paid online.</b> Check their name, hand over the gear, tick Done, then mark it Picked up on the order sheet.</div><div class="sign"><div>Handed over by</div><div>Date</div><div></div></div></section>';
+    else h+='<div class="how"><b>How to ring it up:</b> in Toast, open Retail and add <b>Special Order – [brand]</b> for each item. Type the amount from the Charge column (it already includes their member discount). If the member has already left, create the item on the <b>Merchandise</b> tab in Playbypoint at the same amount and charge it to their account (card on file). Tick Done, then mark the item Picked up on the order sheet.</div>';
+    if(!o.paid) h+='<div class="sign"><div>Rung up by</div><div>Date</div><div>Paid in: Toast / Playbypoint</div></div></section>';
   });
   A.innerHTML=h;
   document.body.classList.add('printing');

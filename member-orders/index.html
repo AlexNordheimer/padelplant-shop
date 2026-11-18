@@ -216,6 +216,21 @@ img{max-width:100%;display:block}
 .tieropt .tt{font-family:var(--CA);font-size:24px;grid-row:1/3;grid-column:2;text-align:right}
 .tieropt .ts{font-size:13px}
 .tieropt[aria-pressed="true"]{background:var(--green);color:var(--cream)}
+.signin{display:grid;gap:8px;margin:6px 0 4px}
+.signin label{font-size:12px;font-weight:600}
+.signin .row{display:flex;gap:10px;flex-wrap:wrap}
+.signin input{flex:1 1 200px;min-width:0;border:1px solid var(--faint);border-radius:14px;background:#fff;padding:12px 14px;font-size:16px}
+.signin .btn{flex:0 0 auto}
+.signin .again{justify-self:start}
+.who{display:grid;gap:4px;border:1px solid var(--green);border-radius:14px;padding:14px 18px}
+.who b{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.who span{font-size:13px}
+.who .link{justify-self:start;margin-top:4px}
+.meta.instore{color:var(--green);font-weight:600}
+.signbtn{background:none;border:0;cursor:pointer}
+input[readonly]{opacity:.7}
+.testbar{background:#f6c445;color:#2b3a2d;font-size:12px;font-weight:700;text-align:center;padding:6px 12px}
+@media (max-width:760px){.toplink.signbtn{display:inline-flex;letter-spacing:.1em;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}.tiersel{display:none}}
 .savebig{font-family:var(--CA);font-style:italic;font-size:34px;line-height:1.05}
 .link{font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:4px}
 .empty{padding:40px 0;color:var(--soft)}
@@ -304,6 +319,7 @@ footer a{text-underline-offset:3px}
   <input name="membership"><input name="order_week"><input name="item_count">
   <input name="list_total"><input name="member_total"><textarea name="items"></textarea>
   <textarea name="items_json"></textarea><textarea name="notes"></textarea>
+  <input name="payment"><input name="order_ref">
 </form>
 
 
@@ -315,6 +331,7 @@ footer a{text-underline-offset:3px}
       <a class="toplink" href="https://www.padelplant.com">padelplant.com</a>
       <a class="toplink" href="#shopAll" id="shopAllLink">Shop all</a>
       <label class="tiersel"><span>Prices for</span><select id="tierSel" aria-label="Show prices for"><option value="">Guests</option><option value="players">Players members</option><option value="founding">Founding members</option></select></label>
+      <button type="button" class="toplink signbtn" id="signBtn">Member sign in</button>
       <button type="button" class="bagbtn" id="bagBtn" aria-label="Open your bag"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="bl">Bag</span><span class="n" id="bagN">0</span></button>
     </div>
   </div>
@@ -335,7 +352,7 @@ footer a{text-underline-offset:3px}
       <div class="facts" aria-label="Member savings">
         <button type="button" data-tier="players"><b>20% off</b><span>Players members</span></button>
         <button type="button" data-tier="founding"><b>30% off</b><span>Founding members</span></button>
-        <div class="wide"><b class="cutoff" id="cutoff"></b>We place orders every Monday. Pick up and pay at the front desk, nothing is charged online.</div>
+        <div class="wide"><b class="cutoff" id="cutoff"></b>Pay online, we place orders every Monday, and you pick up at the front desk.</div>
       </div>
     </div>
   </section>
@@ -367,9 +384,9 @@ footer a{text-underline-offset:3px}
     <h2>How ordering <i>works</i></h2>
     <ol>
       <li><b>Browse</b><span>Everything marked In store is on our shelves now. Switch to Order online for the full Hirostar, Wilson and Nox range.</span></li>
-      <li><b>Send your order</b><span>by Sunday at midnight. Nothing is charged online.</span></li>
+      <li><b>Order and pay</b><span>online by Sunday at midnight. Members sign in for their price.</span></li>
       <li><b>We order Monday</b><span>Most orders arrive in 1 to 2 weeks. We text you when it's at the front desk.</span></li>
-      <li><b>Pick up and pay</b><span>in store. Your member price is applied at the desk.</span></li>
+      <li><b>Pick up</b><span>at the front desk. Anything on our shelves you can buy there any time.</span></li>
     </ol>
   </section>
 
@@ -398,6 +415,7 @@ footer a{text-underline-offset:3px}
 const TIERS = [
   {id:'founding', label:'Founding member', off:0.30},
   {id:'players',  label:'Players member',  off:0.20},
+  {id:'pickleball', label:'Pickleball member', off:0.20, cats:['Apparel','Shoes','Pickleball']},
   {id:'other',    label:'Other / guest',   off:0}
 ];
 const CUTOFF = {day:0}; // Sunday at midnight Eastern
@@ -434,6 +452,26 @@ const PRODUCTS = [
   {id:'nx-at10-genius-18k', brand:'Nox', cat:'Racquets', name:'AT10 Genius 18K 2026', sub:'Agust\u00edn Tapia signature', price:455, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-18k-alum-2026-by-agustin-tapia-pat10genius1826-8435778902621-2175122.png?v=1769512354', url:'https://noxsportusa.com/products/at10-genius-18k-tapia-2026-racket', tag:'New'},
   {id:'nx-ea10-ventus-attack', brand:'Nox', cat:'Racquets', name:'EA10 Ventus Attack 12K 2026', sub:'Edu Alonso signature \u00b7 power', price:400, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/ea10-ventus-attack-12k-xtrem-by-edu-alonso-pea10ventusa1226-8435778902683-7841159.png?v=1769512358', url:'https://noxsportusa.com/products/ea10-ventus-attack-12k-2026-racket', tag:'New'},
   {id:'nx-ventus-hybrid-lite', brand:'Nox', cat:'Racquets', name:'Ventus Hybrid 12K Lite 2026', sub:'Lighter, all-round', price:350, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/ventus-hybrid-12k-lite-pventus12hl-8435778902713-2355266.png?v=1769512358', url:'https://noxsportusa.com/products/ventus-12k-hybrid-lite-2026-racket', tag:'New'},
+  /* Rest of the Nox racquet range (noxsportusa.com, full list price; checked Nov 18, 2026). Ordered online. */
+  {id:'nx-genius-18k-27', brand:'Nox', cat:'Racquets', name:'Genius 18K Alum 2027', sub:'Agust\u00edn Tapia signature', price:450, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAGENIUS1827_1_eaf48a8c-d151-44e4-aa1f-c061d8802df2.png?v=1790268653', url:'https://noxsportusa.com/products/genius-18k-2027-by-agustin-tapia', tag:'New'},
+  {id:'nx-genius-12k-27', brand:'Nox', cat:'Racquets', name:'Genius 12K Alum XTREM 2027', sub:'Agust\u00edn Tapia signature', price:450, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAGENIUS1227_1.png?v=1790270539', url:'https://noxsportusa.com/products/genius-12k-alum-xtrem-2027-by-agustin-tapia', tag:'New'},
+  {id:'nx-genius-12k-lite-27', brand:'Nox', cat:'Racquets', name:'Genius 12K XTREM Lite 2027', sub:'Agust\u00edn Tapia signature \u00b7 lighter', price:415, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAGENIUS12LI27_1.png?v=1790345518', url:'https://noxsportusa.com/products/genius-12k-alum-xtrem-lite-2027-by-agustin-tapia', tag:'New'},
+  {id:'nx-genius-attack-18k-27', brand:'Nox', cat:'Racquets', name:'Genius Attack 18K Alum 2027', sub:'Agust\u00edn Tapia signature \u00b7 power', price:450, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAGENIUSAT1827_1.png?v=1790269319', url:'https://noxsportusa.com/products/genius-attack-18k-alum-2027-by-agustin-tapia', tag:'New'},
+  {id:'nx-genius-attack-12k-27', brand:'Nox', cat:'Racquets', name:'Genius Attack 12K XTREM 2027', sub:'Agust\u00edn Tapia signature \u00b7 power', price:450, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAGENIUSAT1227_1.png?v=1790275690', url:'https://noxsportusa.com/products/genius-attack-12k-alum-xtrem-2027-by-agustin-tapia', tag:'New'},
+  {id:'nx-ventus-3k-27', brand:'Nox', cat:'Racquets', name:'Ventus Control 3K 2027', sub:'Miguel Lamperti signature \u00b7 control', price:415, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAVENTUS327_1.png?v=1790372647', url:'https://noxsportusa.com/products/ventus-control-3k-2027-by-miguel-lamperti', tag:'New'},
+  {id:'nx-procup-hard-27', brand:'Nox', cat:'Racquets', name:'Pro Cup HARD 2027', sub:'Agust\u00edn Tapia \u00b7 firm feel', price:250, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAPCHARD27_1.png?v=1790374025', url:'https://noxsportusa.com/products/pro-cup-hard-2027-by-agustin-tapia'},
+  {id:'nx-procup-soft-27', brand:'Nox', cat:'Racquets', name:'Pro Cup SOFT 2027', sub:'Agust\u00edn Tapia \u00b7 soft feel', price:250, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/PAPCSOFT27_1.png?v=1790374318', url:'https://noxsportusa.com/products/pro-cup-soft-2027-by-agustin-tapia'},
+  {id:'nx-at10-genius-12k', brand:'Nox', cat:'Racquets', name:'AT10 Genius 12K 2026', sub:'Agust\u00edn Tapia signature', price:455, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-12k-alum-xtrem-2026-by-agustin-tapia-pat10genius1226-8435778902645-9466941.png?v=1769512354', url:'https://noxsportusa.com/products/at10-genius-12k-tapia-2026-racket'},
+  {id:'nx-at10-genius-12k-lite', brand:'Nox', cat:'Racquets', name:'AT10 Genius 12K Lite 2026', sub:'Agust\u00edn Tapia signature \u00b7 lighter', price:400, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-12k-alum-xtrem-lite-2026-by-agustin-tapia-pat10genius12li26-8435778902652-8162701.png?v=1769512354', url:'https://noxsportusa.com/products/at10-genius-12k-tapia-lite-2026-racket'},
+  {id:'nx-at10-attack-18k', brand:'Nox', cat:'Racquets', name:'AT10 Genius Attack 18K 2026', sub:'Agust\u00edn Tapia signature \u00b7 power', price:420, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-attack-18k-alum-2026-by-agustin-tapia-pat10geniusat1826-8435778902638-4015240.png?v=1769512354', url:'https://noxsportusa.com/products/at10-genius-attack-18k-tapia-2026-racket'},
+  {id:'nx-at10-attack-12k', brand:'Nox', cat:'Racquets', name:'AT10 Genius Attack 12K 2026', sub:'Agust\u00edn Tapia signature \u00b7 power', price:420, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-luxury-genius-attack-12k-alum-xtrem-2026-by-agustin-tapia-pat10geniusat1226-8435778902669-3810595.png?v=1769512360', url:'https://noxsportusa.com/products/at10-genius-attack-12k-tapia-2026-racket'},
+  {id:'nx-ea10-ventus-hybrid', brand:'Nox', cat:'Racquets', name:'EA10 Ventus Hybrid 12K 2026', sub:'Edu Alonso signature \u00b7 all-round', price:400, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/ea10-ventus-hybrid-12k-xtrem-by-edu-alonso-pea10ventush1226-8435778902676-9207640.png?v=1769512358', url:'https://noxsportusa.com/products/ea10-ventus-hybrid-12k-2026-racket'},
+  {id:'nx-ml10-ventus-3k', brand:'Nox', cat:'Racquets', name:'ML10 Ventus Control 3K 2026', sub:'Miguel Lamperti signature \u00b7 control', price:400, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/ml10-ventus-control-3k-by-miguel-lamperti-pml10ventus326-8435778902690-1107820.png?v=1769512360', url:'https://noxsportusa.com/products/ml10-ventus-3k-2026-racket'},
+  {id:'nx-vk10-ventus-12k', brand:'Nox', cat:'Racquets', name:'VK10 Ventus Control 12K 2026', sub:'Aranzazu Osoro signature \u00b7 control', price:350, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/vk10-ventus-control-12k-by-aranzazu-osoro-pvk10ventus1226-8435778902706-3301494.png?v=1769512358', url:'https://noxsportusa.com/products/vk10-ventus-12k-2026-racket'},
+  {id:'nx-equation-hard-26', brand:'Nox', cat:'Racquets', name:'Equation HARD Advanced 2026', sub:'Intermediate \u00b7 firm feel', price:175, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/equation-hard-advanced-pequhadv26-8435778902744-7143230.png?v=1769512362', url:'https://noxsportusa.com/products/equation-hard-2026-racket'},
+  {id:'nx-x-one-silhouette', brand:'Nox', cat:'Racquets', name:'X-ONE Silhouette', sub:'Beginner friendly', price:125, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/x-one-silhouette-palas-psilhouet26nox-5788101.webp?v=1794452214', url:'https://noxsportusa.com/products/x-one-silhoutte'},
+  {id:'nx-x-hero-blue', brand:'Nox', cat:'Racquets', name:'X-Hero Blue', sub:'Beginner friendly', price:110, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/x-hero-blue-pxherobl-8435778902782-7907333.png?v=1769512362', url:'https://noxsportusa.com/products/x-hero-blue-racket'},
+  {id:'nx-genius-junior', brand:'Nox', cat:'Racquets', name:'Genius Junior', sub:'Junior racquet \u00b7 Agust\u00edn Tapia', price:115, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/at10-genius-jr-by-agustin-tapia-palas-pat10jr26nox-4618138.webp?v=1794451459', url:'https://noxsportusa.com/products/genius-junior-by-agustin-tapia'},
   {id:'nx-xfoam-jma', brand:'Nox', cat:'Pickleball', name:'X-FOAM JMA 16mm', sub:'Pickleball paddle', price:249.95, img:'https://cdn.shopify.com/s/files/1/0658/8045/7287/files/pala-pickleball-x-foam-jma-16mm-palas-pickleball-ppixfojma26nox-8910291.png?v=1769512320', url:'https://noxsportusa.com/products/2026-pickleball-paddle-x-foam-jma-16mm', tag:'New'},
 
   // ---------- Wilson (US prices from wilson.com, Oct 2026) ----------
@@ -456,7 +494,7 @@ const WILSON_IMG = {
   'WR190811U':'WR190811U_0_OPTIX_V2_POWER_RED_Grey_Red_1_red_01.png',
   'WR190711U':'WR190711U_0_OPTIX_V2_LITE_WHITE_White_Beige_white_01.png',
   'WR213811U':'WR213811U_0_Blade_v4_JR_BrightGreen_green_01.png',
-  'WRS338740':'WRS338480_0_Rush_Pro_5_DejaVuBlue_White_Black_dejaVuBlueWhiteBlack_01.png',
+  'WRS338740':'WRS338740_0_Rush_Pro_5_Padel_White_White_White_whiteWhiteWhite_01.png', // white: the colorway in the shop
   'WRS340980':'WRS340980_0_Courtglide_Padel_Black_White_LunarRock_blackWhiteLunarRock_01.png',
   'WRS340970':'WRS340970_0_Courtglide_Padel_W_White_Bay_SkipperBlue_whiteBaySkipperBlue_01.png',
   'WR8913001':'WR8913001_0_Padel_Super_Tour_Red_Red_red_01.png',
@@ -504,7 +542,7 @@ PRODUCTS.forEach(p => {
 });
 /* Each shoe color gets its own photo (from Wilson's store) */
 const SHOE_COLOR_IMG = {
-  'wl-wrs00930': {'Black / Infrared / White':'WRS338750_0_Rush_Pro_5_Padel_Black_Infrared_White_blackInfraredWhite_01.png','White / White / White':'WRS338740_0_Rush_Pro_5_Padel_White_White_White_whiteWhiteWhite_01.png','Gray Dawn / Black / Tender Yellow':'WRS338760_0_Rush_Pro_5_Padel_GrayDawn_Black_TenderYellow_grayDawnBlackTenderYellow_01.png','Snow White / Snow White / Safety Yellow':'WRS339720_5_Rush_Pro_5_Padel_SnowWhit_SnowWhit_SftyYell_png_snowWhiteSnowWhiteSafetyYellow_01.png'},
+  'wl-wrs00930': {'White / White / White':'WRS338740_0_Rush_Pro_5_Padel_White_White_White_whiteWhiteWhite_01.png','Black / Infrared / White':'WRS338750_0_Rush_Pro_5_Padel_Black_Infrared_White_blackInfraredWhite_01.png','Gray Dawn / Black / Tender Yellow':'WRS338760_0_Rush_Pro_5_Padel_GrayDawn_Black_TenderYellow_grayDawnBlackTenderYellow_01.png','Snow White / Snow White / Safety Yellow':'WRS339720_5_Rush_Pro_5_Padel_SnowWhit_SnowWhit_SftyYell_png_snowWhiteSnowWhiteSafetyYellow_01.png'},
   'wl-wrs01019': {'Black / White / Lunar Rock':'WRS340980_0_Courtglide_Padel_Black_White_LunarRock_blackWhiteLunarRock_01.png','White / Bay / Fiery Coral':'WRS340990_5_Courtglide_Padel_White_Bay_FieryCoral_whiteBayFieryCoral_01.png','White / Navy Blazer / Quarry':'WRS341000_0_Courtglide_Padel_White_NavyBlazer_Quarry_whiteNavyBlazerQuarry_01.png'},
   'wl-wrs01020': {'White / Airy Blue / Navy Blazer':'WRS341120_0_Courtglide_Padel_W_White_AiryBlue_NavyBlazer_whiteAiryBlueNavyBlazer_01.png','White / Bay / Skipper Blue':'WRS340970_0_Courtglide_Padel_W_White_Bay_SkipperBlue_whiteBaySkipperBlue_01.png','White / White / Silver':'WRS341110_0_Courtglide_Padel_W_White_White_Silver_whiteWhiteSilver_01.png'}
 };
@@ -521,7 +559,9 @@ PRODUCTS.forEach(p => { const m = SHOE_COLOR_IMG[p.id]; if (!m) return; p.colors
 })();
 /* Not orderable on Wilson B2B (checked Nov 2, 2026). Still shown under In store when Toast has them. */
 const NOT_ON_B2B = ['wl-wr21390','wl-wr19030','wl-wr19050','wl-wr19080','wl-wr19070','wl-breakpoint-tee','wl-classic-court-short','wl-warmup-jacket','wl-america-crew','wl-allday-halfzip','wl-everyday-brami'];
-PRODUCTS.forEach(p => { if (NOT_ON_B2B.includes(p.id)) p.shopOnly = true; });
+/* Hirostar apparel: in store only for now (not ordered online). Shown under In store when Toast has it. */
+const HIROSTAR_APPAREL_IN_STORE_ONLY = true;
+PRODUCTS.forEach(p => { if (NOT_ON_B2B.includes(p.id) || (HIROSTAR_APPAREL_IN_STORE_ONLY && p.brand === 'Hirostar' && p.cat === 'Apparel')) p.shopOnly = true; });
 /* Photos for in-store items whose Toast entry has no picture (Toast photos win when added). */
 const SHOP_ONLY_IMG = [
   [/^wilson defy v1/i, WILSON_CDN + 'WR173711U_0_DEFY_V1_PADEL_blackGold_01.png?width=600'],
@@ -561,7 +601,7 @@ function WILSON(){
     W('WR19070','Racquets','Optix V2 Lite','Optix series · light and easy',139,'optix-v2-lite-wr19070','WR190711U_/WR190711U__cb92fea6516d6188ed24bdd81f8ebf0d.png',['Lilac','White']),
     W('WR21380','Racquets','Blade Jr V4','Junior',149,'blade-jr-v4-padel-frm-wr21380','WR213811U_/WR213811U__7bfb2bea7fa0d646cbf7a756df0a4d42.png',['Green']),
     // Shoes (US sizes)
-    W('WRS00930','Shoes','Rush Pro 5',"Men's padel shoe",170,'rush-pro-5-padel-wrs00930','WRS338740_/WRS338740__a16539447f717e1f75a373587469611b.png',['Black / Infrared / White','Gray Dawn / Black / Tender Yellow','White / White / White','Snow White / Snow White / Safety Yellow'],MENS),
+    W('WRS00930','Shoes','Rush Pro 5',"Men's padel shoe",170,'rush-pro-5-padel-wrs00930','WRS338740_/WRS338740__a16539447f717e1f75a373587469611b.png',['White / White / White','Black / Infrared / White','Gray Dawn / Black / Tender Yellow','Snow White / Snow White / Safety Yellow'],MENS),
     W('WRS01019','Shoes','Courtglide',"Men's padel shoe",85,'courtglide-padel-wrs01019','WRS340980_/WRS340980__723f262e723e2998cc579faf60e5a2da.png',['Black / White / Lunar Rock','White / Bay / Fiery Coral','White / Navy Blazer / Quarry'],MENS),
     W('WRS01020','Shoes','Courtglide',"Women's padel shoe",85,'courtglide-padel-w-wrs01020','WRS340970_/WRS340970__2611d2c7798a91e93538a9736ebfd773.png',['White / Airy Blue / Navy Blazer','White / Bay / Skipper Blue','White / White / Silver'],WOMENS),
     // Bags & accessories
@@ -602,6 +642,12 @@ const BRANDS = ['Hirostar','Nox','Wilson'];
 const AT_CLUB = {
 };
 const atClub = p => Object.prototype.hasOwnProperty.call(AT_CLUB, p.id);
+/* What's on the shelf, per online product: list of sizes in store ([] = the item itself, no sizes).
+   Anything on the shelf is bought at the front desk, not online. */
+const IN_STORE = {};
+/* Stocked items are bought at the desk, except racquets: those can also be ordered online (we bring in a new one). */
+const ORDER_STOCKED_ONLINE = ['Racquets'];
+const inStoreVariant = (pid,size) => { const s=IN_STORE[pid]; if(!s) return false; const pp=PRODUCTS.find(x=>x.id===pid); if(pp && ORDER_STOCKED_ONLINE.includes(pp.cat)) return false; return !s.length || (!!size && s.includes(size)); };
 
 /* Live stock from Toast (served by the Netlify function at /api/stock).
    TOAST_LINK pins a Toast item name to a product id when the automatic match can't tell them apart. */
@@ -664,6 +710,7 @@ async function loadStock(){
     Object.entries(found).forEach(([id,f])=>{
       if (id.startsWith('ts-')) return;
       const sizes = sortSizes([...f.sizes]);
+      IN_STORE[id] = sizes;
       AT_CLUB[id] = sizes.length ? 'In store in size'+(sizes.length>1?'s ':' ')+sizes.join(', ')
                   : f.counted && f.qty <= 2 ? 'Only '+Math.floor(f.qty)+' left in store'
                   : 'In stock in store';
@@ -679,9 +726,9 @@ const CATS = ['Padel Plant merch','Racquets','Pickleball','Shoes','Apparel','Bag
    They show only under "In store" and are bought at the front desk. */
 const SHOP_ONLY = []; const shopOnlySeen = new Set();
 const SHOE_MODELS = [
-  {re:/^intrigue/i, name:'Intrigue Tour', sub:"Women's padel shoe", img:'WRS336940_/WRS336940__a0f6de9eea65eebeb983d1a15af67b22.png'},
+  {re:/^intrigue/i, name:'Intrigue Tour', sub:"Women's padel shoe", src:WILSON_CDN+'WRS338900_5_Intrigue_Tour_Padel_AiryBlue_White_AiryBlue_airyBlueWhiteAiryBlue_01.png?width=600'}, // Airy Blue, the colorway in the shop
   // Toast lists the same shoe as "Hurakn 2.0" and "Hurakn Pro V2": one card
-  {re:/^hurakn (pro v2|2\.0)/i, name:'Hurakn 2.0', sub:"Men's padel shoe", src:'https://cdn.shopify.com/s/files/1/0409/8706/6536/products/MENS-HURAKN-2-0-BLACK-WH-EBONY-WRS330500-3.jpg?width=600'}
+  {re:/^hurakn (pro v2|2\.0)/i, name:'Hurakn 2.0', sub:"Men's padel shoe", src:WILSON_CDN+'WRS338270_0_Hurakn_Pro_V2_Black_Infrared_ClearWhite_blackInfraredWhite_01.png?width=600'} // Black / Infrared, the colorway in the shop
 ];
 /* Toast Retail items we don't show online (not sold anymore, no photo yet, or not for the site) */
 const HIDE_FROM_SITE = [/^bela tour/i, /alien light/i, /^the plant shirt/i, /pickle ?balls?/i, /\bhat\b(?!.*here to serve)/i, /^here to serve(?!.*hat)/i, /crewneck|hoodie|beanie|green t-?shirt/i];
@@ -745,6 +792,8 @@ const state = {
 const tier = () => TIERS.find(t=>t.id===state.tier) || null;
 const offPrice = (p,off) => Math.round(Math.round(p*100)*Math.round((1-off)*100)/100)/100;
 const memberPrice = p => offPrice(p, tier()?tier().off:0);
+// A tier can be limited to some categories (Pickleball members: apparel, shoes and pickleball paddles)
+const offFor = (t,p) => !t || !t.off ? 0 : (t.cats && !(p && t.cats.includes(p.cat)) ? 0 : t.off);
 const PLAYERS = TIERS.find(t=>t.id==='players'), FOUNDING = TIERS.find(t=>t.id==='founding');
 const firstImg = p => p.img || (p.colors ? Object.values(p.colors)[0] : '');
 
@@ -804,8 +853,8 @@ function priceLine(p){
   const w=document.createElement('div'); w.className='pline';
   const b=document.createElement('b'); w.appendChild(b);
   const tr=tier();
-  if (!p.sale && tr && tr.off){
-    b.textContent=money(offPrice(p.price,tr.off));
+  if (!p.sale && offFor(tr,p)){
+    b.textContent=money(offPrice(p.price,offFor(tr,p)));
     const s=document.createElement('s'); s.textContent=money(p.price); w.appendChild(s);
     return w;
   }
@@ -841,6 +890,7 @@ function cardEl(p){
   if (!state.staffPick){
     const q=document.createElement('button'); q.type='button'; q.className='quick';
     if (p.shopOnly){ q.textContent='In store only'; q.classList.add('muted'); }
+    else if (!p.sizes && inStoreVariant(p.id,null)){ q.textContent='Buy in store'; q.classList.add('muted'); q.onclick=e=>{ e.stopPropagation(); openProduct(p); }; }
     else if (p.sizes || (p.colors && Object.keys(p.colors).length>1)){ q.textContent='Choose options'; q.onclick=e=>{ e.stopPropagation(); openProduct(p); }; }
     else { q.textContent='+ Add to bag'; q.onclick=e=>{ e.stopPropagation(); addToBag({pid:p.id, color:p.colors?Object.keys(p.colors)[0]:null, size:null, qty:1}); }; }
     m.appendChild(q);
@@ -987,7 +1037,8 @@ function priceBlock(p, big){
   const a=document.createElement('span'); a.className='amt'; a.textContent=money(p.price);
   const l=document.createElement('span'); l.className='lbl'; l.textContent='Regular price';
   reg.append(a,l); w.appendChild(reg);
-  [FOUNDING, PLAYERS].forEach((t,k)=>{
+  const PICKLE = TIERS.find(t=>t.id==='pickleball');
+  [FOUNDING, PLAYERS].concat(offFor(PICKLE,p)?[PICKLE]:[]).forEach((t,k)=>{
     const r=document.createElement('div'); r.className='mrow'+(k===0?' top':'');
     const who=document.createElement('span'); who.className='who'; who.textContent=t.label.replace(' member','');
     const mp=document.createElement('span'); mp.className='mp'; mp.textContent=money(offPrice(p.price,t.off));
@@ -1028,6 +1079,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !$('#sheet').hid
 
 function openProduct(p){
   const sel = {color: p.colors ? Object.keys(p.colors)[0] : null, size:null, qty:1};
+  let syncAdd = ()=>{};
   openSheet(body=>{
     const d=document.createElement('div'); d.className='detail'; body.appendChild(d);
     const left=document.createElement('div'); d.appendChild(left);
@@ -1036,7 +1088,7 @@ function openProduct(p){
     const br=document.createElement('div'); br.className='label'; br.style.color='var(--soft)'; br.textContent=p.brand+' · '+p.cat; right.appendChild(br);
     const h=document.createElement('h2'); h.textContent=p.name; right.appendChild(h);
     const s=document.createElement('p'); s.className='desc'; s.textContent=p.sub+(p.colorNote?' \u00b7 '+p.colorNote:''); right.appendChild(s);
-    if (atClub(p)){ const n=document.createElement('p'); n.className='clubnote'; n.style.margin='-4px 0 16px'; n.innerHTML='<b></b><span></span>'; n.querySelector('b').textContent=(AT_CLUB[p.id]||'In stock in store'); n.querySelector('span').textContent=p.shopOnly?'Come by the front desk to try it and buy it. Member prices apply.':'Grab it at the front desk today, or add it to this week\u2019s order below.'; right.appendChild(n); }
+    if (atClub(p)){ const n=document.createElement('p'); n.className='clubnote'; n.style.margin='-4px 0 16px'; n.innerHTML='<b></b><span></span>'; n.querySelector('b').textContent=(AT_CLUB[p.id]||'In stock in store'); n.querySelector('span').textContent=p.shopOnly?'Come by the front desk to try it and buy it. Member prices apply.':(ORDER_STOCKED_ONLINE.includes(p.cat)?' Grab it at the front desk today, or order it below and we\u2019ll bring in a new one.':(IN_STORE[p.id]||[]).length?' Sizes on the shelf are bought at the front desk. Order any other size below.':' It\u2019s on the shelf, so buy it at the front desk. Member prices apply.'); right.appendChild(n); }
     const pb=priceBlock(p,true); pb.style.marginBottom='20px'; right.appendChild(pb);
     if (p.shopOnly) return;
 
@@ -1053,7 +1105,7 @@ function openProduct(p){
       const o=document.createElement('div'); o.className='opt';
       o.innerHTML='<div class="label">Size</div>';
       const c=document.createElement('div'); c.className='chips'; o.appendChild(c);
-      const draw=()=>chipRow(c, p.sizes.map(k=>({id:k,label:k})), sel.size, k=>{ sel.size=k; draw(); if(err) err.textContent=''; });
+      const draw=()=>chipRow(c, p.sizes.map(k=>({id:k,label:k})), sel.size, k=>{ sel.size=k; draw(); if(err) err.textContent=''; syncAdd(); });
       draw(); right.appendChild(o);
     }
     const q=document.createElement('div'); q.className='opt';
@@ -1068,8 +1120,11 @@ function openProduct(p){
 
     const add=document.createElement('button'); add.type='button'; add.className='btn'; add.textContent='Add to order';
     err=document.createElement('p'); err.className='err'; err.setAttribute('role','alert');
+    syncAdd=()=>{ const st=inStoreVariant(p.id, sel.size); add.disabled=st; add.textContent=st?'In store \u00b7 buy at the desk':'Add to order'; };
+    syncAdd();
     add.onclick=()=>{
       if (p.sizes && !sel.size){ err.textContent='Pick a size first.'; return; }
+      if (inStoreVariant(p.id, sel.size)) return;
       addToBag({pid:p.id, color:sel.color, size:sel.size, qty:sel.qty});
       closeSheet();
     };
@@ -1098,7 +1153,7 @@ function lineInfo(l){
   if (l.pid==='request') return {name:l.brand+' request', meta:l.text, img:'', list:0, member:0, brand:l.brand};
   const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return null;
   const meta=[l.color&&l.color!=='Standard'?l.color:null, l.size?('Size '+l.size):null, l.qty>1?('Qty '+l.qty):null].filter(Boolean).join(' · ');
-  return {name:p.brand+' '+p.name+(/^(Women|Men)'s/.test(p.sub)?' ('+p.sub.match(/^(Women|Men)'s/)[0]+')':''), meta, img:p.colors&&l.color?p.colors[l.color]:p.img, list:p.price*l.qty, member:memberPrice(p.price)*l.qty, brand:p.brand};
+  return {name:p.brand+' '+p.name+(/^(Women|Men)'s/.test(p.sub)?' ('+p.sub.match(/^(Women|Men)'s/)[0]+')':''), meta, img:p.colors&&l.color?p.colors[l.color]:p.img, list:p.price*l.qty, member:offPrice(p.price,offFor(tier(),p))*l.qty, brand:p.brand};
 }
 function addToBag(line){
   const same = state.bag.find(l=>l.pid===line.pid && l.color===line.color && l.size===line.size && line.pid!=='request');
@@ -1114,10 +1169,10 @@ function toast(line){
   requestAnimationFrame(()=>t.classList.add('show'));
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3800);
 }
-function totals(off){
-  if (off===undefined) off = tier()?tier().off:0;
+function totals(t, skipInStore){
+  if (t===undefined) t = tier();
   let list=0, member=0, count=0;
-  state.bag.forEach(l=>{ count+=l.qty; const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return; list+=p.price*l.qty; member+=offPrice(p.price,off)*l.qty; });
+  state.bag.forEach(l=>{ count+=l.qty; const p=PRODUCTS.find(x=>x.id===l.pid); if(!p) return; if(skipInStore && inStoreVariant(l.pid,l.size)) return; list+=p.price*l.qty; member+=offPrice(p.price,offFor(t,p))*l.qty; });
   return {list:Math.round(list*100)/100, member:Math.round(member*100)/100, save:Math.round((list-member)*100)/100, count};
 }
 function renderBag(){
@@ -1125,109 +1180,198 @@ function renderBag(){
   $('#bagbar').hidden = !state.bag.length;
   $('#bagN').textContent = t.count;
   $('#bagCount').textContent = t.count+(t.count===1?' item':' items');
-  const best=totals(FOUNDING.off);
+  const best=totals(FOUNDING);
   $('#bagTotal').textContent = best.save>0 ? 'Save up to '+money(best.save) : money(t.list);
 }
-$('#openBag').addEventListener('click',openReview);
-$('#bagBtn').addEventListener('click',openReview);
+$('#openBag').addEventListener('click',()=>openReview());
+$('#bagBtn').addEventListener('click',()=>openReview());
 $('#toTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 window.addEventListener('hashchange',()=>{ if(location.hash==='#feature' && !state.staffPick){ state.staffPick=true; renderAll(); renderStaffBar(); } });
 
-function openReview(){
+/* ---------- member sign-in (email or mobile, matched to Playbypoint) and checkout (Stripe) ----------
+   Backend: Supabase function "shop" (or "shop-test" after visiting ?shoptest=1). It checks the
+   member's Playbypoint membership for the discount and recomputes every price itself. */
+// Previews (anything that isn't shop.padelplant.com) always use Stripe test mode.
+const TESTMODE = location.hostname!=='shop.padelplant.com' || (()=>{ try{ const q=new URLSearchParams(location.search).get('shoptest'); if(q!==null) sessionStorage.setItem('shoptest', q==='0'?'':'1'); return !!sessionStorage.getItem('shoptest'); }catch(e){ return false; } })();
+const SHOP_API = 'https://uwguwwsppevxzmqcloro.supabase.co/functions/v1/' + (TESTMODE ? 'shop-test' : 'shop');
+async function api(action, body){
+  const r = await fetch(SHOP_API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action, shop:location.origin, ...(body||{})})});
+  const j = await r.json().catch(()=>({error:'Something went wrong. Try again.'}));
+  if (!r.ok || j.error) throw new Error(j.error || ('Error '+r.status));
+  return j;
+}
+state.auth = store.get('auth', null);
+const payTier = () => state.auth && state.auth.tier ? TIERS.find(t=>t.id===state.auth.tier) || null : null;
+const payOff = p => offFor(payTier(), p);
+function setAuth(a){
+  state.auth = a; store.set('auth', a);
+  if (a && a.tier) setTier(a.tier);
+  renderAuth();
+}
+function renderAuth(){
+  const b=$('#signBtn'); if(!b) return;
+  const a=state.auth;
+  b.textContent = a ? ((a.name||'').split(' ')[0] || 'My account') + (a.tier_label ? ' · '+a.tier_label.replace(/ member$/,'') : '') : 'Member sign in';
+}
+function signInBox(onDone){
+  // Members sign in with the email or mobile on their Playbypoint account. No code; they stay signed in on this device.
+  const box=document.createElement('div'); box.className='signin';
+  box.innerHTML='<label for="si-email">Email on your Padel Plant account</label><input id="si-email" type="email" autocomplete="email">'
+    +'<label for="si-phone">Mobile <span style="font-weight:400;color:var(--soft)">(if your email doesn’t match)</span></label><div class="row"><input id="si-phone" type="tel" autocomplete="tel" inputmode="tel"><button type="button" class="btn">Sign in</button></div><p class="err" role="alert"></p>';
+  const em=box.querySelector('#si-email'), ph=box.querySelector('#si-phone'), b=box.querySelector('button'), e=box.querySelector('.err');
+  em.value=(state.me && state.me.email) || ''; ph.value=(state.me && state.me.phone) || '';
+  const go=async()=>{ const email=em.value.trim(); e.textContent='';
+    if(!/^\S+@\S+\.\S+$/.test(email)){ e.textContent='Enter your email.'; em.focus(); return; }
+    b.disabled=true; b.textContent='Checking…';
+    try{
+      const a=await api('match',{email, phone:ph.value});
+      if(!a.matched){ e.textContent='We couldn’t find a membership for that email or mobile. Use the ones on your Playbypoint account, or check out at the regular price.'; b.disabled=false; b.textContent='Sign in'; return; }
+      setAuth({token:a.token, email:a.email, name:a.name, tier:a.tier, tier_label:a.tier_label}); onDone && onDone();
+    }catch(x){ e.textContent=x.message; b.disabled=false; b.textContent='Sign in'; } };
+  b.onclick=go; [em,ph].forEach(i=>i.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); go(); } });
+  return box;
+}
+function openAccount(){
+  openSheet(body=>{
+    const w=document.createElement('div'); w.className='review'; body.appendChild(w);
+    if (!state.auth){
+      w.innerHTML='<div class="label" style="color:var(--soft)">Members</div><h2>Sign in</h2><p class="fine" style="margin-top:6px">Use the email or mobile on your Padel Plant account. Your member price is applied automatically, and you stay signed in on this device.</p>';
+      w.appendChild(signInBox(()=>{ closeSheet(); renderAll(); renderBag(); }));
+      return;
+    }
+    const a=state.auth;
+    w.innerHTML='<div class="label" style="color:var(--soft)">Signed in</div><h2></h2><p class="fine" style="margin-top:6px"></p>';
+    w.querySelector('h2').textContent=a.name||a.email;
+    w.querySelector('p').textContent = a.tier_label ? a.tier_label+' prices are applied at checkout ('+a.email+').' : 'We couldn’t find a membership with shop savings for '+a.email+', so regular prices apply. Think that’s wrong? Ask at the front desk.';
+    const out=document.createElement('button'); out.type='button'; out.className='link'; out.textContent='Sign out';
+    out.onclick=async()=>{ try{ await api('sign_out',{token:a.token}); }catch(e){} setAuth(null); setTier('other'); closeSheet(); };
+    w.appendChild(out);
+  }, 'account');
+}
+$('#signBtn').addEventListener('click', openAccount);
+renderAuth();
+if (TESTMODE){ const tb=document.createElement('div'); tb.className='testbar'; tb.textContent='Test mode: payments use Stripe test cards (4242 4242 4242 4242). Nothing is really charged.'; document.body.prepend(tb); }
+if (state.auth && state.auth.token) api('me',{token:state.auth.token}).then(j=>{
+  if (!j.signed_in) { setAuth(null); return; }
+  setAuth({...state.auth, email:j.email, name:j.name||state.auth.name, tier:j.tier, tier_label:j.tier_label});
+}).catch(()=>{});
+
+function openReview(notice){
   openSheet(body=>{
     const w=document.createElement('div'); w.className='review'; body.appendChild(w);
     const {cut, place}=orderWindow();
     w.innerHTML='<div class="label" style="color:var(--soft)">Goes in on '+fmtDay(place)+'</div><h2>Your order</h2>';
+    if (notice){ const n=document.createElement('p'); n.className='err'; n.textContent=notice; w.appendChild(n); }
     const lines=document.createElement('div'); lines.className='lines'; w.appendChild(lines);
+    const acct=document.createElement('div'); acct.className='tiers'; w.appendChild(acct);
     const tot=document.createElement('div'); tot.className='totals'; w.appendChild(tot);
+    const blocked=()=>state.bag.filter(l=>l.pid!=='request' && inStoreVariant(l.pid,l.size));
+    const priced=()=>state.bag.filter(l=>l.pid!=='request');
     const draw=()=>{
       lines.innerHTML='';
-      if(!state.bag.length){ lines.innerHTML='<p class="empty">Your order is empty.</p>'; tot.innerHTML=''; return; }
+      if(!state.bag.length){ lines.innerHTML='<p class="empty">Your order is empty.</p>'; tot.innerHTML=''; acct.innerHTML=''; send.hidden=true; return; }
       state.bag.forEach((l,idx)=>{
         const i=lineInfo(l); if(!i) return;
+        const p=PRODUCTS.find(x=>x.id===l.pid);
         const r=document.createElement('div'); r.className='line';
         const th=document.createElement('div'); th.className='th'; if(i.img){const im=document.createElement('img'); im.src=i.img; im.alt=''; th.appendChild(im);} r.appendChild(th);
         const mid=document.createElement('div'); mid.style.minWidth='0';
         const nm=document.createElement('div'); nm.className='nm'; nm.textContent=i.name; mid.appendChild(nm);
         const mt=document.createElement('div'); mt.className='meta'; mt.textContent=i.meta; mid.appendChild(mt);
+        if (l.pid!=='request' && inStoreVariant(l.pid,l.size)){ const n=document.createElement('div'); n.className='meta instore'; n.textContent='On the shelf now: buy it at the front desk. Remove it to check out.'; mid.appendChild(n); }
         r.appendChild(mid);
         const rt=document.createElement('div'); rt.className='rt';
-        rt.innerHTML = l.pid==='request' ? '<div class="meta">Price TBC</div>' : '<div>'+money(i.member)+'</div>'+(tier()&&tier().off?'<div class="meta"><s>'+money(i.list)+'</s></div>':'');
+        if (l.pid==='request') rt.innerHTML='<div class="meta">Price to confirm</div>';
+        else { const off=payOff(p), list=p.price*l.qty, mem=offPrice(p.price,off)*l.qty; rt.innerHTML='<div>'+money(mem)+'</div>'+(off?'<div class="meta"><s>'+money(list)+'</s></div>':''); }
         const rm=document.createElement('button'); rm.type='button'; rm.className='rm'; rm.textContent='Remove';
         rm.onclick=()=>{ state.bag.splice(idx,1); store.set('bag',state.bag); renderBag(); draw(); };
         rt.appendChild(rm); r.appendChild(rt);
         lines.appendChild(r);
       });
-      drawTiers();
-      const t=totals();
-      if (!tier()) tot.innerHTML = '<div class="big">'+money(t.list)+'</div><div class="small">Regular price. Pick your membership below to see your savings.</div>';
-      else if (tier().off) tot.innerHTML = '<div class="savebig">You save '+money(t.save)+'</div><div class="big">'+money(t.member)+'</div><div class="small">'+tier().label+' price \u00b7 regular '+money(t.list)+'</div><div class="small">Plus Virginia sales tax at pickup</div>';
-      else tot.innerHTML = '<div class="big">'+money(t.list)+'</div><div class="small">Plus Virginia sales tax at pickup</div>';
+      drawAcct();
+      const t=totals(payTier(), true), hasPriced=priced().length;
+      tot.innerHTML = !hasPriced ? '<div class="small">Special requests aren’t charged now. We’ll confirm a price with you before we order.</div>'
+        : (t.save>0 ? '<div class="savebig">You save '+money(t.save)+'</div><div class="big">'+money(t.member)+'</div><div class="small">'+payTier().label+' price · regular '+money(t.list)+'</div>'
+               : '<div class="big">'+money(t.list)+'</div><div class="small">Regular price'+(payTier()&&payTier().cats?' (your Pickleball member savings apply to apparel, shoes and paddles)':'')+'</div>')
+          + '<div class="small">Virginia sales tax is added at checkout</div>';
+      send.hidden=false;
+      send.textContent = hasPriced ? 'Continue to payment' : 'Send my request';
+      fine.textContent = hasPriced
+        ? 'You’ll pay by card on the next screen. Orders close '+fmtDay(cut)+' at midnight and are placed Monday. Most arrive in 1 to 2 weeks, and we’ll let you know when your gear is at the front desk.'
+        : 'Orders close '+fmtDay(cut)+' at midnight. We’ll reach out about your request before we order it.';
     };
-    const tiersBox=document.createElement('div'); tiersBox.className='tiers';
-    const drawTiers=()=>{
-      tiersBox.innerHTML='<div class="q">Which membership do you have?</div>';
-      TIERS.forEach(tr=>{
-        const t=totals(tr.off);
-        const b=document.createElement('button'); b.type='button'; b.className='tieropt'; b.setAttribute('aria-pressed', String(state.tier===tr.id));
-        b.innerHTML='<span class="tl"></span><span class="tt"></span><span class="ts"></span>';
-        b.querySelector('.tl').textContent=tr.label+(tr.off?' \u00b7 '+Math.round(tr.off*100)+'% off':'');
-        b.querySelector('.tt').textContent=money(t.member);
-        b.querySelector('.ts').textContent=tr.off?('You save '+money(t.save)):'Regular price';
-        b.onclick=()=>{ setTier(tr.id); draw(); };
-        tiersBox.appendChild(b);
-      });
+    const drawAcct=()=>{
+      acct.innerHTML='';
+      if (state.auth){
+        const a=state.auth, d=document.createElement('div'); d.className='who';
+        d.innerHTML='<b></b><span></span>';
+        d.querySelector('b').textContent = a.tier_label ? a.tier_label+' prices applied' : 'Signed in';
+        d.querySelector('span').textContent = a.tier_label ? 'Signed in as '+a.email+(a.tier==='pickleball'?' \u00b7 20% off apparel, shoes and paddles':'') : 'No membership with shop savings found for '+a.email+', so regular prices apply.';
+        const o=document.createElement('button'); o.type='button'; o.className='link'; o.textContent='Not you? Sign out';
+        o.onclick=async()=>{ try{ await api('sign_out',{token:a.token}); }catch(e){} setAuth(null); em.readOnly=false; draw(); };
+        d.appendChild(o); acct.appendChild(d);
+      } else {
+        const q=document.createElement('div'); q.className='q'; q.textContent='Members, sign in for your price'; acct.appendChild(q);
+        const sub=document.createElement('p'); sub.className='small'; sub.style.margin='0 0 4px'; sub.textContent='Players save 20%, Founding members 30%, Pickleball members 20% on apparel, shoes and paddles. Not a member? Skip this and check out below at the regular price.'; acct.appendChild(sub);
+        acct.appendChild(signInBox(()=>{ em.value=state.auth.email; em.readOnly=true; if(!nm.value && state.auth.name) nm.value=state.auth.name; draw(); }));
+      }
     };
-    w.insertBefore(tiersBox, tot);
-    draw();
-
     const f=document.createElement('form'); f.className='form'; f.noValidate=true; w.appendChild(f);
     const field=(id,label,type,val,full,ac)=>{ const d=document.createElement('div'); d.className='field'+(full?' full':''); d.innerHTML='<label for="'+id+'">'+label+'</label>'; const i=document.createElement('input'); i.id=id; i.name=id; i.type=type; i.value=val||''; if(ac) i.autocomplete=ac; d.appendChild(i); f.appendChild(d); return i; };
-    const nm=field('f-name','Name','text',state.me.name,true,'name');
-    const em=field('f-email','Email','email',state.me.email,false,'email');
+    const nm=field('f-name','Name','text',state.me.name||(state.auth&&state.auth.name)||'',true,'name');
+    const em=field('f-email','Email','email',state.auth?state.auth.email:state.me.email,false,'email'); if(state.auth) em.readOnly=true;
     const ph=field('f-phone','Mobile','tel',state.me.phone,false,'tel');
     const nd=document.createElement('div'); nd.className='field full'; nd.innerHTML='<label for="f-notes">Anything we should know? (optional)</label>';
     const notes=document.createElement('textarea'); notes.id='f-notes'; notes.style.minHeight='64px'; nd.appendChild(notes); f.appendChild(nd);
-
-    const fine=document.createElement('p'); fine.className='fine';
-    fine.textContent='Nothing is charged now. Orders close '+fmtDay(cut)+' at midnight and are placed Monday. Most arrive in 1 to 2 weeks, and we’ll let you know when your gear is at the front desk, and you can pay in store or on the card you have on file.';
-    w.appendChild(fine);
+    const fine=document.createElement('p'); fine.className='fine'; w.appendChild(fine);
     const err=document.createElement('p'); err.className='err'; err.setAttribute('role','alert');
-    const send=document.createElement('button'); send.type='button'; send.className='btn'; send.textContent='Send my order';
+    const send=document.createElement('button'); send.type='button'; send.className='btn';
     w.append(send, err);
+    draw();
 
     send.onclick=async ()=>{
       err.textContent='';
       if(!state.bag.length){ err.textContent='Add something first.'; return; }
-      if(!tier()){ err.textContent='Pick your membership above.'; tiersBox.scrollIntoView({behavior:'smooth',block:'center'}); return; }
-      if(!nm.value.trim()){ err.textContent='Add your name so we can match it to your membership.'; nm.focus(); return; }
+      if(blocked().length){ err.textContent='Remove the items that are on the shelf now. Those are bought at the front desk.'; return; }
+      if(!nm.value.trim()){ err.textContent='Add your name.'; nm.focus(); return; }
       if(!/^\S+@\S+\.\S+$/.test(em.value.trim())){ err.textContent='Add an email we can reach you at.'; em.focus(); return; }
       if(ph.value.replace(/\D/g,'').length<10){ err.textContent='Add a mobile number so we can reach you when it arrives.'; ph.focus(); return; }
       state.me={name:nm.value.trim(), email:em.value.trim(), phone:ph.value.trim()}; store.set('me',state.me);
-      const t=totals();
-      const items = state.bag.map(l=>{ const i=lineInfo(l); return l.pid==='request' ? '• REQUEST ('+l.brand+' '+l.cat+'): '+l.text : '• '+l.qty+' × '+i.name+(i.meta?' — '+i.meta:'')+' — '+money(i.member)+(tier().off?' (regular '+money(i.list)+')':''); }).join('\n');
-      const json = JSON.stringify(state.bag.map(l=>{ const p=PRODUCTS.find(x=>x.id===l.pid); return {sku:l.pid, brand:p?p.brand:l.brand, product:p?p.name:'Request', color:l.color||null, size:l.size||null, qty:l.qty, list_each:p?p.price:null, member_each:p?memberPrice(p.price):null, request:l.text||null}; }));
-      const data = {'form-name':'member-order','bot-field':'',name:state.me.name,email:state.me.email,phone:state.me.phone,membership:tier().label,order_week:fmtDay(place),item_count:String(t.count),list_total:money(t.list),member_total:money(t.member),items,items_json:json,notes:notes.value.trim()};
-      send.disabled=true; send.textContent='Sending…';
+      const label=send.textContent; send.disabled=true; send.textContent='One moment…';
       try{
-        const r = await fetch('/', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(data).toString()});
-        if(!r.ok) throw new Error(r.status);
-        const first = state.me.name.split(' ')[0];
+        const j=await api('checkout',{ token: state.auth?state.auth.token:null, name:state.me.name, email:state.me.email, phone:state.me.phone, notes:notes.value.trim(),
+          lines: priced().map(l=>({pid:l.pid, color:l.color||null, size:l.size||null, qty:l.qty})),
+          requests: state.bag.filter(l=>l.pid==='request').map(l=>({brand:l.brand, cat:l.cat, text:l.text})) });
+        if (j.url){ location.href=j.url; return; }
         state.bag=[]; store.set('bag',state.bag); renderBag();
-        body.innerHTML='';
-        const d=document.createElement('div'); d.className='done';
-        d.innerHTML='<div class="label">Order received</div><h2></h2><p></p>';
-        d.querySelector('h2').textContent='Thanks, '+first+'.';
-        d.querySelector('p').textContent='Your order goes in on '+fmtDay(place)+'. We’ll let you know when it’s ready at the front desk.';
-        const b=document.createElement('button'); b.type='button'; b.className='btn'; b.style.marginTop='10px'; b.textContent='Keep browsing'; b.onclick=closeSheet; d.appendChild(b);
-        body.appendChild(d);
+        showDone(state.me.name.split(' ')[0], j.order_week, false);
       }catch(e){
-        send.disabled=false; send.textContent='Send my order';
-        err.textContent='That didn’t go through. Check your connection and try again, or show this screen at the front desk.';
+        send.disabled=false; send.textContent=label;
+        err.textContent=e.message||'That didn’t go through. Try again.';
       }
     };
   }, 'bag');
 }
+function showDone(first, week, paid){
+  openSheet(body=>{
+    const d=document.createElement('div'); d.className='done';
+    d.innerHTML='<div class="label"></div><h2></h2><p></p>';
+    d.querySelector('.label').textContent = paid ? 'Order paid' : 'Request received';
+    d.querySelector('h2').textContent='Thanks'+(first?', '+first:'')+'.';
+    d.querySelector('p').textContent = (week?'Your order goes in on '+week+'. ':'')+(paid?'We’ve emailed your receipt, and we’ll let you know when your gear is ready at the front desk.':'We’ll reach out about your request before we order it.');
+    const b=document.createElement('button'); b.type='button'; b.className='btn'; b.style.marginTop='10px'; b.textContent='Keep browsing'; b.onclick=closeSheet; d.appendChild(b);
+    body.appendChild(d);
+  }, 'done');
+}
+// Back from Stripe
+(()=>{
+  const q=new URLSearchParams(location.search), sid=q.get('paid');
+  if (q.get('checkout')==='canceled'){ history.replaceState(null,'',location.pathname); setTimeout(()=>openReview('Payment canceled. Your bag is still here.'),300); }
+  if (!sid) return;
+  history.replaceState(null,'',location.pathname);
+  state.bag=[]; store.set('bag',state.bag); renderBag();
+  api('confirm',{session_id:sid}).then(j=>showDone(j.first_name, j.order_week, j.paid)).catch(()=>showDone('', '', true));
+})();
 
 const matchesQ = p => { if (!state.q) return true; const hay=(p.brand+' '+p.name+' '+p.sub+' '+p.cat).toLowerCase(); return state.q.toLowerCase().split(/\s+/).filter(Boolean).every(w=>hay.includes(w)); };
 const priceOf = p => p.sale ? offPrice(p.price,p.sale) : p.price;
